@@ -8,10 +8,12 @@ using IMS_Dashboard.ViewModels.DashboardVM;
 using IMS_Dashboard.ViewModels.InventoryVM;
 using IMS_Dashboard.ViewModels.OrderVM;
 using IMS_Dashboard.ViewModels.SuppliersVM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS_Dashboard.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ICustomerService _customerService;

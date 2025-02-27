@@ -1,5 +1,8 @@
-﻿using IMS_Dashboard.Models.Responses;
+﻿using IMS_Dashboard.Models.Entities;
+using IMS_Dashboard.Models.Responses;
+using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Services.SupplierServices.Interface;
+using IMS_Dashboard.ViewModels.CategoryVM;
 using IMS_Dashboard.ViewModels.CustomersVM;
 using IMS_Dashboard.ViewModels.SuppliersVM;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,15 +14,17 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
 {
     public class SupplierService : ISupplierService
     {
+        private readonly IsupplierRepository _supplierRepo;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SupplierService> _logger;
         private readonly IMemoryCache _cache;
         private const string cacheKey = "SupplierList";
-        public SupplierService(HttpClient httpClient, ILogger<SupplierService> logger, IMemoryCache cache)
+        public SupplierService(HttpClient httpClient, ILogger<SupplierService> logger, IMemoryCache cache, IsupplierRepository supplierRepo)
         {
             _httpClient = httpClient;
             _logger = logger;
             _cache = cache;
+            _supplierRepo = supplierRepo;
         }
 
         public async Task<IEnumerable<DisplaySupplierViewModel>> GetAllSuppliers()
@@ -32,28 +37,35 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
 
             try
             {
-                var response = await _httpClient.GetAsync("api/suppliers");
-                if(response.IsSuccessStatusCode)
-                {
-                    var suppliers = await response.Content.ReadFromJsonAsync<IEnumerable<DisplaySupplierViewModel>>();
-                    if(suppliers != null)
-                    {
-                        _cache.Set(cacheKey, suppliers, TimeSpan.FromMinutes(5));
-                        _logger.LogInformation("Suppliers List successfully retrieved and cached.");
+                //var response = await _httpClient.GetAsync("api/suppliers");
+                //if(response.IsSuccessStatusCode)
+                //{
+                //    var suppliers = await response.Content.ReadFromJsonAsync<IEnumerable<DisplaySupplierViewModel>>();
+                //    if(suppliers != null)
+                //    {
+                //        _cache.Set(cacheKey, suppliers, TimeSpan.FromMinutes(5));
+                //        _logger.LogInformation("Suppliers List successfully retrieved and cached.");
 
-                        return suppliers;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("The API returned a null suppliers list.");
-                        return Enumerable.Empty<DisplaySupplierViewModel>();
-                    }
-                }
-                else
+                //        return suppliers;
+                //    }
+                //    else
+                //    {
+                //        _logger.LogWarning("The API returned a null suppliers list.");
+                //        return Enumerable.Empty<DisplaySupplierViewModel>();
+                //    }
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Error fetching suppliers from API. Status Code: {response.StatusCode}");
+                //    throw new SupplierServiceException("Failed to retrieved suppliers from the API.");
+                //}
+
+                var suppliers = await _supplierRepo.GetAll();
+                return suppliers.Select(c => new DisplaySupplierViewModel
                 {
-                    _logger.LogError($"Error fetching suppliers from API. Status Code: {response.StatusCode}");
-                    throw new SupplierServiceException("Failed to retrieved suppliers from the API.");
-                }
+                    id = c.Id,
+                    supplier_name = c.SupplierName
+                }).ToList();
             }
             catch(HttpRequestException httpEx)
             {

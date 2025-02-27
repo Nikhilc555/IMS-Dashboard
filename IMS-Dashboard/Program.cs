@@ -25,12 +25,31 @@ using System.Net.Http.Headers;
 using IMS_Dashboard;
 using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Repositories.repos;
+using System.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var configuration = builder.Configuration;
+
+builder.Services.AddDbContext<ImsDbContext>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("IMSDb")));
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddSingleton<ImsDbContext>();
+builder.Services.AddScoped<ImsDbContext>();
 builder.Services.AddScoped<IcategoryRepository, categoryRepository>();
+builder.Services.AddScoped<IproductRepository, productRepository>();
+builder.Services.AddScoped<IinventoryRepository, inventoryRepository>();
+builder.Services.AddScoped<IsupplierRepository, supplierRepository>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
 
 // Read Base Address from Configuration
 var apiBaseAddress = builder.Configuration["ApiSettings:BaseAddress"];
@@ -113,7 +132,7 @@ builder.Services.AddHttpClient<IUnitOfMeasureService, UnitOfMeasureService>(clie
     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
-
+builder.Services.AddAuthorization();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -127,15 +146,17 @@ if (app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

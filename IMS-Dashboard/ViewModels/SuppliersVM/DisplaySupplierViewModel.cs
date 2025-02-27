@@ -4,9 +4,9 @@ namespace IMS_Dashboard.ViewModels.SuppliersVM
 {
     public class DisplaySupplierViewModel
     {
-        public Guid SupplierId { get; set; }
-        [Display(Name = "Supplier Name")]
-        public string SupplierName { get; set; }
+        //public Guid SupplierId { get; set; }
+        //[Display(Name = "Supplier Name")]
+        //public string SupplierName { get; set; }
 
         [Display(Name = "Contact Person")]
         public string ContactName { get; set; }
@@ -34,5 +34,11 @@ namespace IMS_Dashboard.ViewModels.SuppliersVM
 
         [Display(Name = "Notes")]
         public string? Notes { get; set; }
+
+
+        public int id { get; set; }
+
+        [Display(Name = "Supplier Name")]
+        public string supplier_name { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using IMS_Dashboard.Models.Responses;
+﻿using IMS_Dashboard.Models.Entities;
+using IMS_Dashboard.Models.Responses;
 using IMS_Dashboard.Services.InventoryServices.Interface;
 using IMS_Dashboard.Services.ProductServices.Service;
 using IMS_Dashboard.ViewModels.InventoryVM;
@@ -152,6 +153,60 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                     UnitPrice = inventoryViewModel.UnitPrice,
                     Remark = inventoryViewModel.Remark,
                     TransactionDate = inventoryViewModel.TransactionDate,
+                };
+
+                _logger.LogInformation("Sending request to create a new inventory.");
+
+                var content = new StringContent(JsonConvert.SerializeObject(inventoryToCreate), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/inventories", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _cache.Remove(cacheKey);
+                    _logger.LogInformation("Inventory created successfully.");
+
+                    return true;
+                }
+                else
+                {
+                    var message = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning($"Failed to create inventory: {response.StatusCode}, Error: {message}");
+
+                    _logger.LogWarning($"Request content: {JsonConvert.SerializeObject(inventoryToCreate)}");
+
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the inventory.");
+                return false;
+            }
+        }
+
+        public async Task<bool> AddInventory(AddInventoryViewModel inventoryViewModel)
+        {
+            if (inventoryViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(inventoryViewModel));
+            }
+
+            try
+            {
+                // Calculate QuantityInStock
+                int quantityInStock = inventoryViewModel.QuantityAdded;
+                quantityInStock = Math.Max(quantityInStock, 0); // Prevent nagative stock
+
+                var inventoryToCreate = new ImportInventory
+                {
+                    CtnNo = inventoryViewModel.CTNNo,
+                    ShippingMark = inventoryViewModel.ShippingMark,
+                    ProductId = inventoryViewModel.ProductId,
+                    Qty = inventoryViewModel.QuantityAdded,
+                    Weight = inventoryViewModel.Weight,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = 1
                 };
 
                 _logger.LogInformation("Sending request to create a new inventory.");

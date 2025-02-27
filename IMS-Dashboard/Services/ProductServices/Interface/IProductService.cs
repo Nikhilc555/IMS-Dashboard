@@ -4,7 +4,7 @@ namespace IMS_Dashboard.Services.ProductServices.Interface
 {
     public interface IProductService
     {
-        Task<IEnumerable<DisplayProductViewModel>> GetAllProducts();
+        Task<IEnumerable<DisplayProductViewModel1>> GetAllProducts();
         Task<int> GetAllProductsCount();
         Task<bool> CreateProduct(CreateProductViewModel productViewModel);
     }

@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "_dashboardLayout";
+    if (ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" 
+        && ViewContext.RouteData.Values["Action"]?.ToString() == "Login")
+    {
+        Layout = "_loginLayout"; // No layout for the login page
+    }
+    else
+    {
+        Layout = "_dashboardLayout"; // Default layout for other pages
+    }
 }

@@ -1,5 +1,7 @@
 ﻿using IMS_Dashboard.Models.Responses;
+using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Services.ProductServices.Interface;
+using IMS_Dashboard.ViewModels.CategoryVM;
 using IMS_Dashboard.ViewModels.ProductsVM;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -9,15 +11,17 @@ namespace IMS_Dashboard.Services.ProductServices.Service
 {
     public class ProductService : IProductService
     {
+        private readonly IproductRepository _productRepo;
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
         private readonly ILogger<ProductService> _logger;
         private const string cacheKey = "ProductList";
-        public ProductService(HttpClient httpClient, IMemoryCache cache, ILogger<ProductService> logger)
+        public ProductService(HttpClient httpClient, IMemoryCache cache, ILogger<ProductService> logger, IproductRepository productRepo)
         {
             _httpClient = httpClient;
             _cache = cache;
             _logger = logger;
+            _productRepo = productRepo;
         }
 
         public async Task<bool> CreateProduct(CreateProductViewModel productViewModel)
@@ -55,11 +59,11 @@ namespace IMS_Dashboard.Services.ProductServices.Service
             }
         }
 
-        public async Task<IEnumerable<DisplayProductViewModel>> GetAllProducts()
+        public async Task<IEnumerable<DisplayProductViewModel1>> GetAllProducts()
         {
 
             // Try to get the products from cache first
-            if(_cache.TryGetValue(cacheKey, out IEnumerable<DisplayProductViewModel> cachedProducts))
+            if(_cache.TryGetValue(cacheKey, out IEnumerable<DisplayProductViewModel1> cachedProducts))
             {
                 _logger.LogInformation("Returning cached product list.");
                 return cachedProducts;
@@ -67,33 +71,40 @@ namespace IMS_Dashboard.Services.ProductServices.Service
 
             try
             {
-                // Make the API call to get all products
-                var response = await _httpClient.GetAsync("api/products");
+                //// Make the API call to get all products
+                //var response = await _httpClient.GetAsync("api/products");
 
-                if (response.IsSuccessStatusCode)
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var products = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayProductViewModel>>();
+
+                //    // Ensure we are not caching a null response
+                //    if(products != null)
+                //    {
+                //        // Store the result in cache for 10 minutes
+                //        _cache.Set(cacheKey, products, TimeSpan.FromMinutes(5));
+                //        _logger.LogInformation("Product list successfully retrieved and cached.");
+
+                //        return products;
+                //    }
+                //    else
+                //    {
+                //        _logger.LogWarning("The API returned a null product list.");
+                //        return Enumerable.Empty<DisplayProductViewModel>();
+                //    }
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Error fetching products from API. Status Code: {response.StatusCode}");
+                //    throw new ProductServiceException("Failed to retrieved products from the API.");
+                //}
+
+                var categories = await _productRepo.GetAll();
+                return categories.Select(c => new DisplayProductViewModel1
                 {
-                    var products = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayProductViewModel>>();
-
-                    // Ensure we are not caching a null response
-                    if(products != null)
-                    {
-                        // Store the result in cache for 10 minutes
-                        _cache.Set(cacheKey, products, TimeSpan.FromMinutes(5));
-                        _logger.LogInformation("Product list successfully retrieved and cached.");
-
-                        return products;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("The API returned a null product list.");
-                        return Enumerable.Empty<DisplayProductViewModel>();
-                    }
-                }
-                else
-                {
-                    _logger.LogError($"Error fetching products from API. Status Code: {response.StatusCode}");
-                    throw new ProductServiceException("Failed to retrieved products from the API.");
-                }
+                    Id = c.Id,
+                    ProductName = c.ProductName
+                }).ToList();
             }
             catch(HttpRequestException httpEx)
             {

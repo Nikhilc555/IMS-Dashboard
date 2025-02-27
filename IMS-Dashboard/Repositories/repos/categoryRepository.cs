@@ -12,22 +12,14 @@ namespace IMS_Dashboard.Repositories.repos
         }
         public async Task<Category> Get(int? Id)
         {
-            var query = "SELECT * FROM Category WHERE id = @Id";
-            using (var connection = _context.CreateConnection())
-            {
-                var category = await connection.QuerySingleOrDefaultAsync<Category>(query, new { Id });
-                return category;
-            }
+            var category = _context.Categories.FirstOrDefault(c => c.Id == Id);
+            return category;
         }
 
         public async Task<IEnumerable<Category>> GetAll()
         {
-            var query = "SELECT * FROM Category";
-            using (var connection = _context.CreateConnection())
-            {
-                var category = await connection.QueryAsync<Category>(query);
-                return category;
-            }
+            var category = _context.Categories.ToList();
+            return category;
         }
     }
 }

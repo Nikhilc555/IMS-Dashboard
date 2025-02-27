@@ -8,5 +8,6 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<IEnumerable<DisplayInventoryViewModel>> GetAllInventories();
         Task<IEnumerable<DisplayRecentInventoryViewModel>> GetRecentInventories();
         Task<bool> CreateInventory(CreateInventoryViewModel inventoryViewModel);
+        Task<bool> AddInventory(AddInventoryViewModel inventoryViewModel);
     }
 }

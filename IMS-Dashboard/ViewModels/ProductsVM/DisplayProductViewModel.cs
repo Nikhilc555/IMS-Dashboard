@@ -36,4 +36,15 @@ namespace IMS_Dashboard.ViewModels.ProductsVM
         public bool IsActive { get; set; }
 
     }
+
+    public class DisplayProductViewModel1
+    {
+        public int Id { get; set; }
+        [Display(Name = "Product Name")]
+        public string ProductName { get; set; }
+
+        [Display(Name = "Product Code")]
+        public string ProductCode { get; set; }
+
+    }
 }

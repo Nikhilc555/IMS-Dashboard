@@ -54,6 +54,16 @@ namespace IMS_Dashboard.Controllers
             return View(createInventoryViewModel);
         }
 
+        [HttpGet("AddInventory")]
+        public async Task<IActionResult> AddInventory()
+        {
+            var addInventoryViewModel = new AddInventoryViewModel();
+
+            // Fetch dropdowns from the API
+            await PopulateDropDownsNew(addInventoryViewModel);
+            return View(addInventoryViewModel);
+        }
+
         [HttpPost("CreateInventory")]
         public async Task<IActionResult> CreateInventory(CreateInventoryViewModel inventoryViewModel)
         {
@@ -96,20 +106,62 @@ namespace IMS_Dashboard.Controllers
             }
         }
 
+        [HttpPost("AddInventory")]
+        public async Task<IActionResult> AddInventory(AddInventoryViewModel inventoryViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(x => x.Errors);
+                foreach (var error in errors)
+                {
+                    _logger.LogError($"Model validation error: {error.ErrorMessage}");
+                }
+
+                await PopulateDropDownsNew(inventoryViewModel);
+                return View(inventoryViewModel);
+            }
+
+            try
+            {
+                _logger.LogInformation("Attempting to create a new inventory.");
+                bool result = await _inventoryService.AddInventory(inventoryViewModel);
+
+                if (result)
+                {
+                    _logger.LogInformation("Inventory creation successful. Redirecting to GetAllInventories.");
+                    return RedirectToAction(nameof(GetAllInventories));
+                }
+                else
+                {
+                    _logger.LogWarning("Inventory creation failed.");
+                    ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                    await PopulateDropDownsNew(inventoryViewModel);
+                    return View(inventoryViewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the inventory.");
+                ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                await PopulateDropDownsNew(inventoryViewModel);
+                return View(inventoryViewModel);
+            }
+        }
+
         private async Task PopulateDropDowns(CreateInventoryViewModel inventoryViewModel)
         {
             var products = await _productService.GetAllProducts();
             inventoryViewModel.Products = products.Select(p => new SelectListItem
             {
-                Value = p.ProductId.ToString(),
+                Value = p.Id.ToString(),
                 Text = p.ProductName
             }).ToList();
 
             var suppliers = await _supplierService.GetAllSuppliers();
             inventoryViewModel.Suppliers = suppliers.Select(s => new SelectListItem
             {
-                Value = s.SupplierId.ToString(),
-                Text = s.SupplierName
+                Value = s.id.ToString(),
+                Text = s.supplier_name
             }).ToList();
 
             var transactionTypes = await _transactionTypeService.GetAllTransactionTypes();
@@ -117,6 +169,22 @@ namespace IMS_Dashboard.Controllers
             {
                 Value = t.TransactionTypeId.ToString(),
                 Text = t.Name
+            }).ToList();
+        }
+        private async Task PopulateDropDownsNew(AddInventoryViewModel inventoryViewModel)
+        {
+            var products = await _productService.GetAllProducts();
+            inventoryViewModel.Products = products.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.ProductName
+            }).ToList();
+
+            var suppliers = await _supplierService.GetAllSuppliers();
+            inventoryViewModel.Suppliers = suppliers.Select(p => new SelectListItem
+            {
+                Value = p.id.ToString(),
+                Text = p.supplier_name
             }).ToList();
         }
     }
