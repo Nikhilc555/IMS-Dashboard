@@ -10,47 +10,55 @@
             <h4 class="card-title">@ViewData["Title"]</h4>
 
             <div class="table-responsive pt-3">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th> # </th>
-                            <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
-                            <th> @Html.DisplayNameFor(model => model.Product) </th>
-                            <th> @Html.DisplayNameFor(model => model.Supplier) </th>
-                            <th> @Html.DisplayNameFor(model => model.Quantity) </th>
-                            <th> @Html.DisplayNameFor(model => model.Weight) </th>
-                            <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
-                            <th> @Html.DisplayNameFor(model => model.Created_by) </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody">
-                        @if (Model != null)
-                        {
-                            int rowNumber = 1;
-                            @foreach (var inventory in Model)
-                            {
-                                <tr data-id="@inventory.Id">
-                                    <td> @rowNumber </td>
-                                    <td> @inventory.CTNNo </td>
-                                    <td> @inventory.ShippingMark </td>
-                                    <td> @inventory.Product </td>
-                                    <td> @inventory.Supplier </td>
-                                    <td> @inventory.Quantity </td>
-                                    <td> @inventory.Weight </td>
-                                    <td> @inventory.CreatedOn </td>
-                                    <td> @inventory.Created_by </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger btn-sm delete-shipment">Delete</button>
-                                    </td>
-                                </tr>
-                                rowNumber++;
-                            }
-                        }
-                    </tbody>
-                </table>
                 <form asp-controller="shipment" asp-action="UpdateInventory" class="forms-sample" method="post" enctype="multipart/form-data">
+
+                    <div class="col-md-6">
+                        <label for="ShippingRef" class="control-label"></label>
+                        <input for="ShippingRef" name="shippingRef" type="text" class="form-control"
+                               placeholder="Enter Shipping Mark.." id="ShippingRef">
+                        <span validation-for="ShippingRef" class="text-danger"></span>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
+                                <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
+                                <th> @Html.DisplayNameFor(model => model.Product) </th>
+                                <th> @Html.DisplayNameFor(model => model.Supplier) </th>
+                                <th> @Html.DisplayNameFor(model => model.Quantity) </th>
+                                <th> @Html.DisplayNameFor(model => model.Weight) </th>
+                                <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
+                                <th> @Html.DisplayNameFor(model => model.Created_by) </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            @if (Model != null)
+                            {
+                                int rowNumber = 1;
+                                @foreach (var inventory in Model)
+                                {
+                                    <tr data-id="@inventory.Id">
+                                        <td> @rowNumber </td>
+                                        <td> @inventory.CTNNo </td>
+                                        <td> @inventory.ShippingMark </td>
+                                        <td> @inventory.Product </td>
+                                        <td> @inventory.Supplier </td>
+                                        <td> @inventory.Quantity </td>
+                                        <td> @inventory.Weight </td>
+                                        <td> @inventory.CreatedOn </td>
+                                        <td> @inventory.Created_by </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm delete-shipment">Delete</button>
+                                        </td>
+                                    </tr>
+                                    rowNumber++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+
                     <input type="hidden" id="updatedInventoryForShipment" name="updatedInventoryForShipment" />
 
                     <button type="submit" class="btn btn-primary" id="submitForShipment">Submit Changes</button>

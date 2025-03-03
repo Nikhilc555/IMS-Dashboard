@@ -45,6 +45,8 @@ builder.Services.AddScoped<IinventoryRepository, inventoryRepository>();
 builder.Services.AddScoped<IsupplierRepository, supplierRepository>();
 builder.Services.AddScoped<IuserRepository, userRepository>();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

@@ -66,7 +66,7 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateInventory(string updatedInventoryForShipment)
+        public async Task<IActionResult> UpdateInventory(string updatedInventoryForShipment, string shippingRef)
         {
             if (!string.IsNullOrEmpty(updatedInventoryForShipment))
             {
@@ -89,7 +89,7 @@ namespace IMS_Dashboard.Controllers
                 try
                 {
                     _logger.LogInformation("Attempting to update for shipment.");
-                    bool result = await _inventoryService.UpdateInventoryForShipment(remainingIds);
+                    bool result = await _inventoryService.UpdateInventoryForShipment(remainingIds, shippingRef);
 
                     if (result)
                     {

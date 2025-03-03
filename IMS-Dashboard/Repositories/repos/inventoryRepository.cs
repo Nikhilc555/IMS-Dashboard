@@ -1,21 +1,81 @@
-﻿using IMS_Dashboard.Models.Entities;
+﻿using Humanizer;
+using IMS_Dashboard.Models.Entities;
 using IMS_Dashboard.Repositories.interfaces;
+using System.Security.Claims;
 
 namespace IMS_Dashboard.Repositories.repos
 {
     public class inventoryRepository : IinventoryRepository
     {
-        private readonly ImsDbContext _context;
-        public inventoryRepository(ImsDbContext context)
+        private readonly ImsDbContext _context; 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public inventoryRepository(ImsDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task Create(ImportInventory inv)
         {
             try
             {
+                var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                inv.CreatedBy = Convert.ToInt32(userId);
+                inv.IsActive = "Y";
+
                 _context.ImportInventories.Add(inv);
                 await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public async Task Update(ImportInventory inv)
+        {
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var existingInv = await _context.ImportInventories.FindAsync(inv.Id);
+
+                if (existingInv != null)
+                {
+                    // Update properties
+                    existingInv.CtnNo = inv.CtnNo;
+                    existingInv.ShippingMark = inv.ShippingMark;
+                    existingInv.SupplierId = inv.SupplierId;
+                    existingInv.ProductId = inv.ProductId;
+                    existingInv.Qty = inv.Qty;
+                    existingInv.Weight = inv.Weight;
+                    existingInv.Updated_by = Convert.ToInt32(userId);
+                    existingInv.Updated_on = DateTime.UtcNow; // Optional timestamp update
+
+                    _context.ImportInventories.Update(existingInv);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public async Task Delete(int id)
+        {
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var existingInv = await _context.ImportInventories.FindAsync(id);
+
+                if (existingInv != null)
+                {
+                    // Update properties
+                    existingInv.IsActive = "N";
+                    existingInv.Updated_by = Convert.ToInt32(userId);
+                    existingInv.Updated_on = DateTime.UtcNow; // Optional timestamp update
+
+                    _context.ImportInventories.Update(existingInv);
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -25,13 +85,19 @@ namespace IMS_Dashboard.Repositories.repos
 
         public async Task<IEnumerable<ImportInventory>> GetAll()
         {
-            var inventory = _context.ImportInventories.ToList();
+            var inventory = _context.ImportInventories.Where(i => i.IsActive == "Y").ToList();
+            return inventory;
+        }
+
+        public async Task<ImportInventory> GetById(int id)
+        {
+            var inventory = _context.ImportInventories.FirstOrDefault(c => c.Id == id);
             return inventory;
         }
 
         public async Task<IEnumerable<ImportInventory>> GetAllPending()
         {
-            var inventory = _context.ImportInventories.Where(c => c.Export_status == false).ToList();
+            var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y").ToList();
             return inventory;
         }
 
@@ -45,7 +111,7 @@ namespace IMS_Dashboard.Repositories.repos
                     DateTime.TryParse(to_date, out DateTime toDate))
                 {
                     // Filter based on CreatedOn date
-                    inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1));
+                    inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive == "N");
                 }
                 else
                 {
@@ -56,24 +122,36 @@ namespace IMS_Dashboard.Repositories.repos
             return inventory;
         }
 
-        public async Task<bool> UpdateForShipment(List<int> remainingIds)
+        public async Task<bool> UpdateForShipment(List<int> remainingIds, string shippingRef)
         {
             try
             {
-                var allInventory = _context.ImportInventories.ToList();
+                var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                foreach (var inventory in allInventory)
+                if (userId != null)
                 {
-                    if (remainingIds.Contains(inventory.Id))
+                    var allInventory = _context.ImportInventories.ToList();
+
+                    foreach (var inventory in allInventory)
                     {
-                        inventory.Export_status = true; // Mark as shipped
-                        _context.ImportInventories.Update(inventory);
+                        if (remainingIds.Contains(inventory.Id))
+                        {
+                            inventory.Export_status = true; // Mark as shipped
+                            inventory.Shipping_ref = shippingRef;
+                            inventory.Shipped_on = DateTime.Now;
+                            inventory.Shipped_by = Convert.ToInt32(userId);
+                            _context.ImportInventories.Update(inventory);
+                        }
                     }
+
+                    _context.SaveChanges();
+
+                    return true;
                 }
-
-                _context.SaveChanges();
-
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             catch(Exception ex) 
             { 

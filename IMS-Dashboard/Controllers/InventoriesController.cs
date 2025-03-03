@@ -1,4 +1,5 @@
 ﻿using IMS_Dashboard.Services.InventoryServices.Interface;
+using IMS_Dashboard.Services.InventoryServices.Service;
 using IMS_Dashboard.Services.ProductServices.Interface;
 using IMS_Dashboard.Services.SupplierServices.Interface;
 using IMS_Dashboard.Services.TransactionTypeServices.Interface;
@@ -67,6 +68,25 @@ namespace IMS_Dashboard.Controllers
         {
             var addInventoryViewModel = new AddInventoryViewModel();
 
+            // Fetch dropdowns from the API
+            await PopulateDropDownsNew(addInventoryViewModel);
+            return View(addInventoryViewModel);
+        }
+
+        [HttpGet("EditInventory")]
+        public async Task<IActionResult> EditInventory(int id)
+        {
+            var addInventoryViewModel = new AddInventoryViewModel();
+
+            var inventory = await _inventoryService.GetInventoryById(id);
+
+            addInventoryViewModel.Id = inventory.Id;
+            addInventoryViewModel.CTNNo = inventory.CTNNo;
+            addInventoryViewModel.ShippingMark = inventory.ShippingMark;
+            addInventoryViewModel.ProductId = inventory.ProductId;
+            addInventoryViewModel.SupplierId = inventory.SupplierId;
+            addInventoryViewModel.QuantityAdded = inventory.Quantity;
+            addInventoryViewModel.Weight = inventory.Weight;
             // Fetch dropdowns from the API
             await PopulateDropDownsNew(addInventoryViewModel);
             return View(addInventoryViewModel);
@@ -153,6 +173,77 @@ namespace IMS_Dashboard.Controllers
                 ModelState.AddModelError("", "An error occurred while creating the inventory.");
                 await PopulateDropDownsNew(inventoryViewModel);
                 return View(inventoryViewModel);
+            }
+        }
+
+        [HttpPost("EditInventory")]
+        public async Task<IActionResult> EditInventory(AddInventoryViewModel inventoryViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(x => x.Errors);
+                foreach (var error in errors)
+                {
+                    _logger.LogError($"Model validation error: {error.ErrorMessage}");
+                }
+
+                await PopulateDropDownsNew(inventoryViewModel);
+                return View(inventoryViewModel);
+            }
+
+            try
+            {
+                _logger.LogInformation("Attempting to create a new inventory.");
+                bool result = await _inventoryService.EditInventory(inventoryViewModel);
+
+                if (result)
+                {
+                    _logger.LogInformation("Inventory creation successful. Redirecting to GetAllInventories.");
+                    return RedirectToAction(nameof(GetAllInventories));
+                }
+                else
+                {
+                    _logger.LogWarning("Inventory creation failed.");
+                    ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                    await PopulateDropDownsNew(inventoryViewModel);
+                    return View(inventoryViewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the inventory.");
+                ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                await PopulateDropDownsNew(inventoryViewModel);
+                return View(inventoryViewModel);
+            }
+        }
+
+        [HttpPost("DeleteInventory")]
+        public async Task<IActionResult> DeleteInventory(int id)
+        {
+
+            try
+            {
+                _logger.LogInformation("Attempting to delete an inventory.");
+                bool result = await _inventoryService.DeleteInventory(id);
+
+                if (result)
+                {
+                    _logger.LogInformation("Inventory deletion successful. Redirecting to GetAllInventories.");
+                    return RedirectToAction(nameof(GetAllInventories));
+                }
+                else
+                {
+                    _logger.LogWarning("Inventory deletion failed.");
+                    ModelState.AddModelError("", "An error occurred while deleting the inventory.");
+                    return RedirectToAction(nameof(GetAllInventories));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the inventory.");
+                ModelState.AddModelError("", "An error occurred while deleting the inventory.");
+                return RedirectToAction(nameof(GetAllInventories));
             }
         }
 

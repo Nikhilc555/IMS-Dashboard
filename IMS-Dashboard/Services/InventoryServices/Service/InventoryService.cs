@@ -448,33 +448,11 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                     Qty = inventoryViewModel.QuantityAdded,
                     Weight = inventoryViewModel.Weight,
                     SupplierId = inventoryViewModel.SupplierId,
-                    CreatedOn = DateTime.Now,
-                    CreatedBy = 1,
+                    CreatedOn = DateTime.UtcNow,
                     Export_status = false
                 };
 
                 _logger.LogInformation("Sending request to create a new inventory.");
-
-                //var content = new StringContent(JsonConvert.SerializeObject(inventoryToCreate), Encoding.UTF8, "application/json");
-
-                //var response = await _httpClient.PostAsync("api/inventories", content);
-
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    _cache.Remove(cacheKey);
-                //    _logger.LogInformation("Inventory created successfully.");
-
-                //    return true;
-                //}
-                //else
-                //{
-                //    var message = await response.Content.ReadAsStringAsync();
-                //    _logger.LogWarning($"Failed to create inventory: {response.StatusCode}, Error: {message}");
-
-                //    _logger.LogWarning($"Request content: {JsonConvert.SerializeObject(inventoryToCreate)}");
-
-                //    return false;
-                //}
 
                 await _inventoryRepo.Create(inventoryToCreate);
 
@@ -487,7 +465,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             }
         }
 
-        public async Task<bool> UpdateInventoryForShipment(List<int> remainingIds)
+        public async Task<bool> UpdateInventoryForShipment(List<int> remainingIds, string shippingRef)
         {
             if (remainingIds == null)
             {
@@ -501,13 +479,115 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
                 
 
-                await _inventoryRepo.UpdateForShipment(remainingIds);
+                await _inventoryRepo.UpdateForShipment(remainingIds, shippingRef);
 
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating the inventory.");
+                return false;
+            }
+        }
+
+        public async Task<GetAllInventoryViewModel> GetInventoryById(int id)
+        {
+            if (_cache.TryGetValue(cacheKey, out GetAllInventoryViewModel cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+
+                var inventories = await _inventoryRepo.GetById(id);
+
+                GetAllInventoryViewModel inventory = new GetAllInventoryViewModel();
+                if (inventories != null)
+                {
+                        inventory = new GetAllInventoryViewModel
+                        {
+                            Id = inventories.Id,
+                            CTNNo = inventories.CtnNo,
+                            ShippingMark = inventories.ShippingMark,
+                            ProductId = inventories?.ProductId,
+                            Quantity = inventories.Qty,
+                            Weight = inventories.Weight,
+                            SupplierId = inventories?.SupplierId
+                        };
+
+                }
+
+                return inventory;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+
+        public async Task<bool> EditInventory(AddInventoryViewModel inventoryViewModel)
+        {
+            if (inventoryViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(inventoryViewModel));
+            }
+
+            try
+            {
+
+                var inventoryToCreate = new ImportInventory
+                {
+                    Id = inventoryViewModel.Id,
+                    CtnNo = inventoryViewModel.CTNNo,
+                    ShippingMark = inventoryViewModel.ShippingMark,
+                    ProductId = inventoryViewModel.ProductId,
+                    Qty = inventoryViewModel.QuantityAdded,
+                    Weight = inventoryViewModel.Weight,
+                    SupplierId = inventoryViewModel.SupplierId,
+                    Updated_on = DateTime.UtcNow,
+                    Export_status = false
+                };
+
+                _logger.LogInformation("Sending request to update an inventory.");
+
+                await _inventoryRepo.Update(inventoryToCreate);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the inventory.");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteInventory(int id)
+        {
+            if (id == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            try
+            {
+
+                _logger.LogInformation("Sending request to delete an inventory.");
+
+                await _inventoryRepo.Delete(id);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the inventory.");
                 return false;
             }
         }

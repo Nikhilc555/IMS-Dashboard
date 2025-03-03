@@ -609,6 +609,5 @@
   // iconify.load('icons.svg').then(function() {
   //   iconify(document.querySelector('.my-cool.icon'));
   // });
-
   
 })(jQuery);

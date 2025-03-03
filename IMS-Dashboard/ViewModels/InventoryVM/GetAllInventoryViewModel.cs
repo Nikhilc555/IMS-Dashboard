@@ -11,6 +11,8 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
 
         [Display(Name = "Shipping Mark")]
         public string ShippingMark { get; set; }
+        public int? ProductId { get; set; }
+        public int? SupplierId { get; set; }
 
         [Display(Name = "Supplier Name")]
         public string Supplier { get; set; }

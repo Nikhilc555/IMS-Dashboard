@@ -33,4 +33,22 @@ public partial class ImportInventory
 
     [Column("export_status")]
     public bool Export_status { get; set; }
+
+    [Column("shipping_ref")]
+    public string? Shipping_ref { get; set; }
+
+    [Column("shipped_on")]
+    public DateTime? Shipped_on { get; set; }
+
+    [Column("shipped_by")]
+    public int? Shipped_by { get; set; }
+
+    [Column("updated_on")]
+    public DateTime? Updated_on { get; set; }
+
+    [Column("updated_by")]
+    public int? Updated_by { get; set; }
+
+    [Column("is_active")]
+    public string? IsActive { get; set; }
 }
