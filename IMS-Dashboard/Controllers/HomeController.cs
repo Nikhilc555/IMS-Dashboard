@@ -40,38 +40,38 @@ namespace IMS_Dashboard.Controllers
         {
             try
             {
-                var customerCount = await _customerService.GetAllCustomersCountAsync();
-                var productCount = await _productService.GetAllProductsCount();
-                var supplierCount = await _supplierService.GetAllSuppliersCountAsync();
-                var inventoryCount = await _inventoryService.GetAllInventoryCount();
-                var orderCount = await _orderService.GetAllOrdersCount();
-                var pendingOrderCount = await _orderService.GetOrdersCountByOrderStatus("Pending");
-                var completedOrderCount = await _orderService.GetOrdersCountByOrderStatus("Completed");
-                var delieverdOrderCount = await _orderService.GetOrdersCountByOrderStatus("Delivered");
+                //var customerCount = await _customerService.GetAllCustomersCountAsync();
+                //var productCount = await _productService.GetAllProductsCount();
+                //var supplierCount = await _supplierService.GetAllSuppliersCountAsync();
+                //var inventoryCount = await _inventoryService.GetAllInventoryCount();
+                //var orderCount = await _orderService.GetAllOrdersCount();
+                //var pendingOrderCount = await _orderService.GetOrdersCountByOrderStatus("Pending");
+                //var completedOrderCount = await _orderService.GetOrdersCountByOrderStatus("Completed");
+                //var delieverdOrderCount = await _orderService.GetOrdersCountByOrderStatus("Delivered");
 
-                var top5customer = await _customerService.GetAllCustomers();
-                var top5supplier = await _supplierService.GetAllSuppliers();
-                var recentOrders = await _orderService.GetRecentOrders(5);
+                //var top5customer = await _customerService.GetAllCustomers();
+                //var top5supplier = await _supplierService.GetAllSuppliers();
+                //var recentOrders = await _orderService.GetRecentOrders(5);
 
-                var recentInventories = await _inventoryService.GetRecentInventories();
+                //var recentInventories = await _inventoryService.GetRecentInventories();
 
                 // Create ViewModel
                 var dashboardViewModel = new DashboardViewModel
                 {
-                    CustomerCount = customerCount,
-                    ProductCount = productCount,
-                    SupplierCount = supplierCount,
-                    InventoryCount = inventoryCount,
-                    OrderCount = orderCount,
-                    PendingOrderCount = pendingOrderCount,
-                    CompletedOrderCount = completedOrderCount,
-                    DeliveredOrderCount = delieverdOrderCount,
-                    TotalOrderCount = pendingOrderCount + completedOrderCount + delieverdOrderCount,
+                    CustomerCount = 0,
+                    ProductCount = 0,
+                    SupplierCount = 0,
+                    InventoryCount = 0,
+                    OrderCount = 0,
+                    PendingOrderCount = 0,
+                    CompletedOrderCount = 0,
+                    DeliveredOrderCount = 0,
+                    TotalOrderCount = 0 + 0 + 0,
 
-                    top5Customers = top5customer,
-                    top5Suppliers = top5supplier,
-                    recentOrders = recentOrders,
-                    recentInventory = recentInventories,
+                    top5Customers = null,
+                    top5Suppliers = null,
+                    recentOrders = null,
+                    recentInventory = null,
                 };
 
                 // Pass the ViewModel to the View

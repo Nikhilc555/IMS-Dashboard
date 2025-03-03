@@ -1,9 +1,7 @@
 ﻿@model IEnumerable<IMS_Dashboard.ViewModels.InventoryVM.GetAllInventoryViewModel>
 
 @{
-    ViewData["Title"] = "Inventory List";
-    var from_date = Model?.FirstOrDefault()?.from_date ?? "N/A";
-    var to_date = Model?.FirstOrDefault()?.to_date ?? "N/A";
+    ViewData["Title"] = "Current Stock";
 }
 
 <div class="col-lg-12 grid-margin stretch-card">
@@ -13,38 +11,17 @@
             @* <p class="card-description">
             Add class <code>.table-bordered</code>
             </p> *@
-            <form class="search-form" asp-controller="Inventories" asp-action="GetAllInventories" method="get">
-                <div class="col-md-12 row">
-                    <div class="col-md-4">
-                        <div id="from_date" class="input-group date datepicker navbar-date-picker">
-                            <span class="input-group-addon input-group-prepend border-right">
-                                <span class="icon-calendar input-group-text calendar-icon"></span>
-                            </span>
-                            <input type="text" name="from_date" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div id="to_date" class="input-group date datepicker navbar-date-picker">
-                            <span class="input-group-addon input-group-prepend border-right">
-                                <span class="icon-calendar input-group-text calendar-icon"></span>
-                            </span>
-                            <input type="text" name="to_date" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                    
-                        <button type="submit" class="btn btn-primary"><i class="icon-search"></i></button>
-                        <button type="button" id="downloadExcel" class="btn btn-primary">Excel</button>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-success" style="float:right;" onclick="window.location.href='@Url.Action("AddInventory", "Inventories")'">
-                            ADD
-                        </button>
-                    </div>
+            <div class="col-md-12 row">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <button type="button" id="downloadExcel" style="float:right;" class="btn btn-primary">Excel</button>
+                    <button type="button" class="btn btn-success" style="float:right;" onclick="window.location.href='@Url.Action("GetInventoryForShipping", "Shipment")'">
+                        Ship Inventory
+                    </button>
                 </div>
-            </form>
+            </div>
             <div class="table-responsive pt-3">
-                <table id="AllInventory" class="table table-bordered download-table">
+                <table id="PendingInventory" class="table table-bordered download-table">
                     <thead>
                         <tr>
                             <th> # </th>
@@ -56,6 +33,8 @@
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
                             <th> @Html.DisplayNameFor(model => model.Created_by) </th>
+                            <th class="edit"></th>
+                            <th class="delete"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,6 +53,8 @@
                                     <td> @inventory.Weight </td>
                                     <td> @inventory.CreatedOn </td>
                                     <td> @inventory.Created_by </td>
+                                    <td> <button type="button" class="btn btn-warning btn-sm edit-inventory">Edit</button> </td>
+                                    <td> <button type="button" class="btn btn-danger btn-sm delete-inventory">Delete</button> </td>
                                 </tr>
                                 rowNumber++;
                             }

@@ -1,11 +1,13 @@
 ﻿using IMS_Dashboard.Models.Entities;
 using IMS_Dashboard.Models.Responses;
+using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Services.InventoryServices.Interface;
 using IMS_Dashboard.Services.ProductServices.Service;
 using IMS_Dashboard.ViewModels.InventoryVM;
 using IMS_Dashboard.ViewModels.SuppliersVM;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -13,15 +15,25 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 {
     public class InventoryService : IInventoryService
     {
+        private readonly IinventoryRepository _inventoryRepo;
+        private readonly IproductRepository _productRepo;
+        private readonly IsupplierRepository _supplierRepo;
+        private readonly IuserRepository _userRepo;
         private readonly HttpClient _httpClient;
         private ILogger<InventoryService> _logger;
         private IMemoryCache _cache;
         private const string cacheKey = "InventoryList";
-        public InventoryService(HttpClient httpClient, ILogger<InventoryService> logger, IMemoryCache cache)
+        public InventoryService(HttpClient httpClient, ILogger<InventoryService> logger, IMemoryCache cache
+            , IinventoryRepository inventoryRepo, IproductRepository productRepo, IsupplierRepository supplierRepo
+            , IuserRepository userRepo)
         {
             _httpClient = httpClient;
             _logger = logger;
             _cache = cache;
+            _inventoryRepo = inventoryRepo;
+            _productRepo = productRepo;
+            _supplierRepo = supplierRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<IEnumerable<DisplayInventoryViewModel>> GetAllInventories()
@@ -56,6 +68,236 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                     _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
                     throw new InventoryServiceException("Failed to retrieved inventories from the API.");
                 }
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventory()
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<GetAllInventoryViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+                //var response = await _httpClient.GetAsync("api/inventories");
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
+                //    if (inventories != null)
+                //    {
+                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
+                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
+
+                //        return inventories;
+                //    }
+                //    else
+                //    {
+                //        _logger.LogWarning("The API returned a null inventories list.");
+                //        return Enumerable.Empty<DisplayInventoryViewModel>();
+                //    }
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
+                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
+                //}
+
+                var inventories = await _inventoryRepo.GetAll();
+
+                IEnumerable<GetAllInventoryViewModel> inventoryList = new List<GetAllInventoryViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories)
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        tempList.Add(new GetAllInventoryViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            ShippingMark = inventory.ShippingMark,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.SupplierName,
+                            CreatedOn = DateTime.Now,
+                            Created_by = user?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed"
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<GetAllInventoryViewModel>> GetPendingInventory()
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<GetAllInventoryViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+                //var response = await _httpClient.GetAsync("api/inventories");
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
+                //    if (inventories != null)
+                //    {
+                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
+                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
+
+                //        return inventories;
+                //    }
+                //    else
+                //    {
+                //        _logger.LogWarning("The API returned a null inventories list.");
+                //        return Enumerable.Empty<DisplayInventoryViewModel>();
+                //    }
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
+                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
+                //}
+
+                var inventories = await _inventoryRepo.GetAllPending();
+
+                IEnumerable<GetAllInventoryViewModel> inventoryList = new List<GetAllInventoryViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories)
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        tempList.Add(new GetAllInventoryViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            ShippingMark = inventory.ShippingMark,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.SupplierName,
+                            CreatedOn = DateTime.Now,
+                            Created_by = user?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed"
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventorywithdate(string from_date, string to_date)
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<GetAllInventoryViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+                //var response = await _httpClient.GetAsync("api/inventories");
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
+                //    if (inventories != null)
+                //    {
+                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
+                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
+
+                //        return inventories;
+                //    }
+                //    else
+                //    {
+                //        _logger.LogWarning("The API returned a null inventories list.");
+                //        return Enumerable.Empty<DisplayInventoryViewModel>();
+                //    }
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
+                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
+                //}
+
+                var inventories = await _inventoryRepo.GetAllWithDate(from_date, to_date);
+
+                IEnumerable<GetAllInventoryViewModel> inventoryList = new List<GetAllInventoryViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories.ToList())
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        tempList.Add(new GetAllInventoryViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            ShippingMark = inventory.ShippingMark,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.SupplierName,
+                            CreatedOn = DateTime.Now,
+                            Created_by = user?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            from_date = from_date,
+                            to_date = to_date,
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
             }
             catch (HttpRequestException httpEx)
             {
@@ -194,9 +436,9 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
             try
             {
-                // Calculate QuantityInStock
-                int quantityInStock = inventoryViewModel.QuantityAdded;
-                quantityInStock = Math.Max(quantityInStock, 0); // Prevent nagative stock
+                //// Calculate QuantityInStock
+                //int quantityInStock = inventoryViewModel.QuantityAdded;
+                //quantityInStock = Math.Max(quantityInStock, 0); // Prevent nagative stock
 
                 var inventoryToCreate = new ImportInventory
                 {
@@ -205,32 +447,63 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                     ProductId = inventoryViewModel.ProductId,
                     Qty = inventoryViewModel.QuantityAdded,
                     Weight = inventoryViewModel.Weight,
+                    SupplierId = inventoryViewModel.SupplierId,
                     CreatedOn = DateTime.Now,
-                    CreatedBy = 1
+                    CreatedBy = 1,
+                    Export_status = false
                 };
 
                 _logger.LogInformation("Sending request to create a new inventory.");
 
-                var content = new StringContent(JsonConvert.SerializeObject(inventoryToCreate), Encoding.UTF8, "application/json");
+                //var content = new StringContent(JsonConvert.SerializeObject(inventoryToCreate), Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync("api/inventories", content);
+                //var response = await _httpClient.PostAsync("api/inventories", content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    _cache.Remove(cacheKey);
-                    _logger.LogInformation("Inventory created successfully.");
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    _cache.Remove(cacheKey);
+                //    _logger.LogInformation("Inventory created successfully.");
 
-                    return true;
-                }
-                else
-                {
-                    var message = await response.Content.ReadAsStringAsync();
-                    _logger.LogWarning($"Failed to create inventory: {response.StatusCode}, Error: {message}");
+                //    return true;
+                //}
+                //else
+                //{
+                //    var message = await response.Content.ReadAsStringAsync();
+                //    _logger.LogWarning($"Failed to create inventory: {response.StatusCode}, Error: {message}");
 
-                    _logger.LogWarning($"Request content: {JsonConvert.SerializeObject(inventoryToCreate)}");
+                //    _logger.LogWarning($"Request content: {JsonConvert.SerializeObject(inventoryToCreate)}");
 
-                    return false;
-                }
+                //    return false;
+                //}
+
+                await _inventoryRepo.Create(inventoryToCreate);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the inventory.");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateInventoryForShipment(List<int> remainingIds)
+        {
+            if (remainingIds == null)
+            {
+                throw new ArgumentNullException(nameof(remainingIds));
+            }
+
+            try
+            {
+
+                _logger.LogInformation("Sending request to create a new inventory.");
+
+                
+
+                await _inventoryRepo.UpdateForShipment(remainingIds);
+
+                return true;
             }
             catch (Exception ex)
             {

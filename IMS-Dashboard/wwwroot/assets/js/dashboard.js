@@ -1,6 +1,83 @@
 (function($) {
   'use strict';
-  $(function() {
+    $(function () {
+
+
+        if ($("#from_date").length) {
+            $('#from_date').datepicker({
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'yyyy-mm-dd',
+            });
+            $("#from_date").datepicker("setDate", "0");
+        }
+
+
+        if ($("#to_date").length) {
+            $('#to_date').datepicker({
+                enableOnReadonly: true,
+                todayHighlight: true,
+                format: 'yyyy-mm-dd',
+            });
+            $("#to_date").datepicker("setDate", "0");
+
+
+        }
+
+        let removedRows = [];
+        let inventoryIds = [];
+
+        document.querySelectorAll("#inventoryTableBody tr").forEach(row => {
+            let rowId = row.getAttribute("data-id");
+            inventoryIds.push(rowId);
+        });
+
+        document.querySelectorAll(".delete-shipment").forEach(button => {
+            button.addEventListener("click", function () {
+                let row = this.closest("tr");
+                let rowId = row.getAttribute("data-id");
+
+                inventoryIds = inventoryIds.filter(id => id !== rowId);
+                // Add to removedRows array
+                removedRows.push(rowId);
+
+                // Remove from the UI
+                row.remove();
+            });
+        });
+        if ($("#submitForShipment").length) {
+            document.getElementById("submitForShipment").addEventListener("click", function () {
+
+                document.getElementById("updatedInventoryForShipment").value = JSON.stringify(inventoryIds);
+            });
+        }
+
+        if ($("#downloadExcel").length) {
+            document.getElementById("downloadExcel").addEventListener("click", function () {
+                //let table = document.querySelector(".download-table"); // Select the table
+                //let tableHTML = table.innerHTML; // Convert table to HTML format
+                //console.log(tableHTML);
+
+                //// Create a download link
+                //let downloadLink = document.createElement("a");
+                //downloadLink.href = "data:application/vnd.ms-excel," + tableHTML;
+                //downloadLink.download = "Inventory.xls"; // File name
+                //document.body.appendChild(downloadLink);
+                //downloadLink.click();
+                //document.body.removeChild(downloadLink);
+
+                let table = document.querySelector(".download-table"); // Select the table
+                let tableId = table.id || "Inventory";
+                let wb = XLSX.utils.book_new(); // Create a new Excel file
+                let ws = XLSX.utils.table_to_sheet(table); // Convert the table to a sheet
+                XLSX.utils.book_append_sheet(wb, ws, tableId); // Add sheet to workbook
+
+                // Save the Excel file
+                XLSX.writeFile(wb, tableId + ".xlsx");
+            });
+        }
+
+
     if ($("#performanceLine").length) { 
       const ctx = document.getElementById('performanceLine');
       var graphGradient = document.getElementById("performanceLine").getContext('2d');
@@ -526,7 +603,8 @@
       date.setTime(date.getTime() + 24 * 60 * 60 * 1000); 
       $.cookie('staradmin2-pro-banner', "true", { expires: date });
     });
-    
+
+
   });
   // iconify.load('icons.svg').then(function() {
   //   iconify(document.querySelector('.my-cool.icon'));

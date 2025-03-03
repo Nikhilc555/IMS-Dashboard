@@ -27,14 +27,22 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInventories()
+        public async Task<IActionResult> GetAllInventories(string? from_date, string? to_date)
         {
             try
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                var inventory = await _inventoryService.GetAllInventories();
-                return View(inventory);
+                if (from_date== null || to_date == null)
+                {
+                    var inventory = await _inventoryService.GetAllInventory();
+                    return View(inventory);
+                }
+                else
+                {
+                    var inventory = await _inventoryService.GetAllInventorywithdate(from_date, to_date);
+                    return View(inventory);
+                }
             }
             catch (HttpRequestException ex)
             {

@@ -1,0 +1,123 @@
+﻿using IMS_Dashboard.Services.InventoryServices.Interface;
+using IMS_Dashboard.Services.ProductServices.Interface;
+using IMS_Dashboard.Services.SupplierServices.Interface;
+using IMS_Dashboard.Services.TransactionTypeServices.Interface;
+using IMS_Dashboard.Services.TransactionTypeServices.Service;
+using IMS_Dashboard.ViewModels.InventoryVM;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+
+namespace IMS_Dashboard.Controllers
+{
+    public class ShipmentController : Controller
+    {
+        private readonly IInventoryService _inventoryService;
+        private readonly IProductService _productService;
+        private readonly ISupplierService _supplierService;
+        private readonly ILogger<InventoriesController> _logger;
+
+        public ShipmentController(IInventoryService inventoryService, IProductService productService, ISupplierService supplierService,
+            ILogger<InventoriesController> logger)
+        {
+            _inventoryService = inventoryService;
+            _productService = productService;
+            _supplierService = supplierService;
+            _logger = logger;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllPendingInventory()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Inventories");
+
+                var inventory = await _inventoryService.GetPendingInventory();
+                return View(inventory);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log Exception
+                _logger.LogError(ex, "Error fetching inventory from the API.");
+                throw;
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInventoryForShipping()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Inventories");
+
+                var inventory = await _inventoryService.GetPendingInventory();
+                return View(inventory);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log Exception
+                _logger.LogError(ex, "Error fetching inventory from the API.");
+                throw;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateInventory(string updatedInventoryForShipment)
+        {
+            if (!string.IsNullOrEmpty(updatedInventoryForShipment))
+            {
+                List<int> remainingIds = JsonConvert.DeserializeObject<List<int>>(updatedInventoryForShipment);
+
+                // Get all existing inventory items
+                //var allInventory = _context.ImportInventories.ToList();
+
+                //foreach (var inventory in allInventory)
+                //{
+                //    if (!remainingIds.Contains(inventory.Id))
+                //    {
+                //        inventory.Status = "Deleted"; // Mark as deleted
+                //        _context.ImportInventories.Update(inventory);
+                //    }
+                //}
+
+                //_context.SaveChanges();
+
+                try
+                {
+                    _logger.LogInformation("Attempting to update for shipment.");
+                    bool result = await _inventoryService.UpdateInventoryForShipment(remainingIds);
+
+                    if (result)
+                    {
+                        _logger.LogInformation("Shipment creation successful. Redirecting to GetInventoryForShipping.");
+                        return RedirectToAction(nameof(GetInventoryForShipping));
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Shipment creation failed.");
+                        ModelState.AddModelError("", "An error occurred while creating the shipment.");
+                        return RedirectToAction(nameof(GetInventoryForShipping));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred while creating the shipment.");
+                    ModelState.AddModelError("", "An error occurred while creating the shipment.");
+                    return RedirectToAction(nameof(GetInventoryForShipping));
+                }
+            }
+
+            return RedirectToAction(nameof(GetInventoryForShipping));
+        }
+
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
+}

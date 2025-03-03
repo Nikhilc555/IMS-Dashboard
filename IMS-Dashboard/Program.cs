@@ -43,6 +43,7 @@ builder.Services.AddScoped<IcategoryRepository, categoryRepository>();
 builder.Services.AddScoped<IproductRepository, productRepository>();
 builder.Services.AddScoped<IinventoryRepository, inventoryRepository>();
 builder.Services.AddScoped<IsupplierRepository, supplierRepository>();
+builder.Services.AddScoped<IuserRepository, userRepository>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -146,7 +147,7 @@ if (app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

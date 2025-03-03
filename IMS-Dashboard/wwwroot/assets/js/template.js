@@ -117,6 +117,7 @@
       $("#datepicker-popup").datepicker("setDate", "0");
     }
 
+
   });
 
   //check all boxes in order status 
