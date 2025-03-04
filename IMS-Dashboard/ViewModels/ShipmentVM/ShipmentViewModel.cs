@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IMS_Dashboard.ViewModels.InventoryVM
+namespace IMS_Dashboard.ViewModels.ShipmentVM
 {
-    public class GetAllInventoryViewModel
+    public class ShipmentViewModel
     {
         public int Id { get; set; }
 
@@ -23,10 +23,17 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Display(Name = "Quantity")]
         public int? Quantity { get; set; }
         public decimal? Weight { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public string Created_by { get; set; }
 
-        [Display(Name = "Status")]
+        [Display(Name = "Shipping Ref")]
+        public string ShippingRef { get; set; }
+
+        [Display(Name = "Shipped On")]
+        public DateTime? ShippedOn { get; set; }
+
+        [Display(Name = "Shipped By")]
+        public string Shipped_by { get; set; }
         public string Export_Status { get; set; }
         public string from_date { get; set; }
         public string to_date { get; set; }

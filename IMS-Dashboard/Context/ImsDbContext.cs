@@ -32,81 +32,81 @@ public partial class ImsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //        modelBuilder.Entity<Category>(entity =>
-        //        {
-        //            entity.ToTable("Category");
+        //modelBuilder.Entity<Category>(entity =>
+        //{
+        //    entity.ToTable("Category");
 
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.CategoryName)
-        //                .HasMaxLength(50)
-        //                .IsUnicode(false)
-        //                .HasColumnName("category_name");
-        //        });
+        //    entity.Property(e => e.Id).HasColumnName("id");
+        //    entity.Property(e => e.CategoryName)
+        //        .HasMaxLength(50)
+        //        .IsUnicode(false)
+        //        .HasColumnName("category_name");
+        //});
 
-        //        modelBuilder.Entity<Manufacturer>(entity =>
-        //        {
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.ManufacturerName)
-        //                .HasMaxLength(100)
-        //                .IsUnicode(false)
-        //                .HasColumnName("manufacturer_name");
-        //        });
+        //modelBuilder.Entity<Manufacturer>(entity =>
+        //{
+        //    entity.Property(e => e.Id).HasColumnName("id");
+        //    entity.Property(e => e.ManufacturerName)
+        //        .HasMaxLength(100)
+        //        .IsUnicode(false)
+        //        .HasColumnName("manufacturer_name");
+        //});
 
-        //        modelBuilder.Entity<Product>(entity =>
-        //        {
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.Category).HasColumnName("category");
-        //            entity.Property(e => e.Description)
-        //                .HasMaxLength(200)
-        //                .IsUnicode(false)
-        //                .HasColumnName("description");
-        //            entity.Property(e => e.IsActive).HasColumnName("is_active");
-        //            entity.Property(e => e.Manufacurer).HasColumnName("manufacurer");
-        //            entity.Property(e => e.Price)
-        //                .HasColumnType("decimal(18, 2)")
-        //                .HasColumnName("price");
-        //            entity.Property(e => e.ProductCode)
-        //                .HasMaxLength(20)
-        //                .IsUnicode(false)
-        //                .HasColumnName("product_code");
-        //            entity.Property(e => e.ProductName)
-        //                .HasMaxLength(100)
-        //                .IsUnicode(false)
-        //                .HasColumnName("product_name");
-        //            entity.Property(e => e.Uom).HasColumnName("uom");
-        //        });
+        //modelBuilder.Entity<Product>(entity =>
+        //{
+        //    entity.Property(e => e.Id).HasColumnName("id");
+        //    entity.Property(e => e.Category).HasColumnName("category");
+        //    entity.Property(e => e.Description)
+        //        .HasMaxLength(200)
+        //        .IsUnicode(false)
+        //        .HasColumnName("description");
+        //    entity.Property(e => e.IsActive).HasColumnName("is_active");
+        //    entity.Property(e => e.Manufacurer).HasColumnName("manufacurer");
+        //    entity.Property(e => e.Price)
+        //        .HasColumnType("decimal(18, 2)")
+        //        .HasColumnName("price");
+        //    entity.Property(e => e.ProductCode)
+        //        .HasMaxLength(20)
+        //        .IsUnicode(false)
+        //        .HasColumnName("product_code");
+        //    entity.Property(e => e.ProductName)
+        //        .HasMaxLength(100)
+        //        .IsUnicode(false)
+        //        .HasColumnName("product_name");
+        //    entity.Property(e => e.Uom).HasColumnName("uom");
+        //});
 
-        //        modelBuilder.Entity<Role>(entity =>
-        //        {
-        //            entity.ToTable("roles");
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.ToTable("roles");
 
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.Role1)
-        //                .HasMaxLength(30)
-        //                .IsUnicode(false)
-        //                .HasColumnName("role");
-        //        });
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Role1)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("role");
+        });
 
-        //        modelBuilder.Entity<ShipmentDetail>(entity =>
-        //        {
-        //            entity.ToTable("shipment_details");
+        //modelBuilder.Entity<ShipmentDetail>(entity =>
+        //{
+        //    entity.ToTable("shipment_details");
 
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-        //            entity.Property(e => e.CreatedOn)
-        //                .HasColumnType("datetime")
-        //                .HasColumnName("created_on");
-        //            entity.Property(e => e.CtnNo).HasColumnName("ctn_no");
-        //            entity.Property(e => e.ProductId).HasColumnName("product_id");
-        //            entity.Property(e => e.Qty).HasColumnName("qty");
-        //            entity.Property(e => e.ShippingMark)
-        //                .HasMaxLength(50)
-        //                .IsUnicode(false)
-        //                .HasColumnName("shipping_mark");
-        //            entity.Property(e => e.Weight)
-        //                .HasColumnType("decimal(18, 2)")
-        //                .HasColumnName("weight");
-        //        });
+        //    entity.Property(e => e.Id).HasColumnName("id");
+        //    entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+        //    entity.Property(e => e.CreatedOn)
+        //        .HasColumnType("datetime")
+        //        .HasColumnName("created_on");
+        //    entity.Property(e => e.CtnNo).HasColumnName("ctn_no");
+        //    entity.Property(e => e.ProductId).HasColumnName("product_id");
+        //    entity.Property(e => e.Qty).HasColumnName("qty");
+        //    entity.Property(e => e.ShippingMark)
+        //        .HasMaxLength(50)
+        //        .IsUnicode(false)
+        //        .HasColumnName("shipping_mark");
+        //    entity.Property(e => e.Weight)
+        //        .HasColumnType("decimal(18, 2)")
+        //        .HasColumnName("weight");
+        //});
 
         modelBuilder.Entity<SystemUser>(entity =>
         {
@@ -117,6 +117,10 @@ public partial class ImsDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasColumnType("datetime")
                 .HasColumnName("created_on");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+            entity.Property(e => e.UpdatedOn)
+                .HasColumnType("datetime")
+                .HasColumnName("updated_on");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.NameOfUser)
                 .HasMaxLength(50)
@@ -132,18 +136,18 @@ public partial class ImsDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("user_name");
         });
-        //        modelBuilder.Entity<UnitOfMeasure>(entity =>
-        //        {
-        //            entity.ToTable("Unit_of_Measure");
+        //modelBuilder.Entity<UnitOfMeasure>(entity =>
+        //{
+        //    entity.ToTable("Unit_of_Measure");
 
-        //            entity.Property(e => e.Id).HasColumnName("id");
-        //            entity.Property(e => e.Uom)
-        //                .HasMaxLength(50)
-        //                .IsUnicode(false)
-        //                .HasColumnName("uom");
-        //        });
+        //    entity.Property(e => e.Id).HasColumnName("id");
+        //    entity.Property(e => e.Uom)
+        //        .HasMaxLength(50)
+        //        .IsUnicode(false)
+        //        .HasColumnName("uom");
+        //});
 
-        //        OnModelCreatingPartial(modelBuilder);
+        //OnModelCreatingPartial(modelBuilder);
     }
 
     //    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

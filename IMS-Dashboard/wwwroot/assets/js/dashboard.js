@@ -9,7 +9,7 @@
                 todayHighlight: true,
                 format: 'yyyy-mm-dd',
             });
-            $("#from_date").datepicker("setDate", "0");
+            //$("#from_date").datepicker("setDate", "0");
         }
 
 
@@ -19,9 +19,16 @@
                 todayHighlight: true,
                 format: 'yyyy-mm-dd',
             });
-            $("#to_date").datepicker("setDate", "0");
+            //$("#to_date").datepicker("setDate", "0");
 
 
+        }
+
+        if ($('input[name="from_date"]').val()) {
+            $('.datepicker[name="from_date"]').datepicker('setDate', $('input[name="from_date"]').val());
+        }
+        if ($('input[name="to_date"]').val()) {
+            $('.datepicker[name="to_date"]').datepicker('setDate', $('input[name="to_date"]').val());
         }
 
         let removedRows = [];

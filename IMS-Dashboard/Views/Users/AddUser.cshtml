@@ -1,0 +1,41 @@
+﻿@model IMS_Dashboard.ViewModels.UserVM.AddUserViewModel
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Create User</h4>
+
+            <form asp-action="AddUser" class="forms-sample" method="post" enctype="multipart/form-data" autocomplete="off">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label asp-for="name" class="control-label"></label>
+                        <input asp-for="name" type="text" class="form-control"
+                               placeholder="Enter name of user.." id="name">
+                        <span asp-validation-for="name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="username" class="control-label"></label>
+                        <input asp-for="username" type="text" class="form-control"
+                               placeholder="Enter username.." id="username" autocomplete="new-username">
+                        <span asp-validation-for="username" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="password" class="control-label"></label>
+                        <input asp-for="password" type="password" class="form-control"
+                               placeholder="Enter password.." id="password" autocomplete="new-password">
+                        <span asp-validation-for="password" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="role_id" class="control-label"></label>
+                        <select class="form-select" asp-for="role_id" asp-items="@Model.Roles"></select>
+                        <span asp-validation-for="role_id" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add User</button>
+            </form>
+        </div>
+    </div>
+</div>

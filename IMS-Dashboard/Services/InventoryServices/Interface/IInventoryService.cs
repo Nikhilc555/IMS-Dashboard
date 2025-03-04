@@ -1,4 +1,5 @@
 ﻿using IMS_Dashboard.ViewModels.InventoryVM;
+using IMS_Dashboard.ViewModels.ShipmentVM;
 
 namespace IMS_Dashboard.Services.InventoryServices.Interface
 {
@@ -10,6 +11,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<GetAllInventoryViewModel> GetInventoryById(int id);
         Task<IEnumerable<GetAllInventoryViewModel>> GetPendingInventory();
         Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventorywithdate(string from_date, string to_date);
+        Task<IEnumerable<ShipmentViewModel>> GetShipmentwithdate(string from_date, string to_date);
         Task<IEnumerable<DisplayRecentInventoryViewModel>> GetRecentInventories();
         Task<bool> CreateInventory(CreateInventoryViewModel inventoryViewModel);
         Task<bool> AddInventory(AddInventoryViewModel inventoryViewModel);

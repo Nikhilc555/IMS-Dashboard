@@ -29,6 +29,8 @@ using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using IMS_Dashboard.Services.UserServices.Interface;
+using IMS_Dashboard.Services.UserServices.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +46,9 @@ builder.Services.AddScoped<IproductRepository, productRepository>();
 builder.Services.AddScoped<IinventoryRepository, inventoryRepository>();
 builder.Services.AddScoped<IsupplierRepository, supplierRepository>();
 builder.Services.AddScoped<IuserRepository, userRepository>();
+builder.Services.AddScoped<IroleRepository, roleRepository>();
+builder.Services.AddScoped<IuserService, userService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddHttpContextAccessor();
 

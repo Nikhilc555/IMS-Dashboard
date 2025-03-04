@@ -16,10 +16,10 @@ namespace IMS_Dashboard.Controllers
         private readonly IInventoryService _inventoryService;
         private readonly IProductService _productService;
         private readonly ISupplierService _supplierService;
-        private readonly ILogger<InventoriesController> _logger;
+        private readonly ILogger<ShipmentController> _logger;
 
         public ShipmentController(IInventoryService inventoryService, IProductService productService, ISupplierService supplierService,
-            ILogger<InventoriesController> logger)
+            ILogger<ShipmentController> logger)
         {
             _inventoryService = inventoryService;
             _productService = productService;
@@ -55,6 +55,24 @@ namespace IMS_Dashboard.Controllers
                 _logger.LogInformation("Fetching all Inventories");
 
                 var inventory = await _inventoryService.GetPendingInventory();
+                return View(inventory);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log Exception
+                _logger.LogError(ex, "Error fetching inventory from the API.");
+                throw;
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetShippedDetails(string? from_date, string? to_date)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Inventories");
+
+                var inventory = await _inventoryService.GetShipmentwithdate(from_date, to_date);
                 return View(inventory);
             }
             catch (HttpRequestException ex)

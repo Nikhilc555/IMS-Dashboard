@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
+using IMS_Dashboard.Services.InventoryServices.Interface;
 
 namespace IMS_Dashboard.Controllers
 {
@@ -15,6 +16,7 @@ namespace IMS_Dashboard.Controllers
     {
         private readonly ImsDbContext _context;
         private readonly PasswordHasher<SystemUser> _passwordHasher;
+        Encryption enc = new Encryption();
 
         public AccountController(ImsDbContext context)
         {
@@ -52,14 +54,16 @@ namespace IMS_Dashboard.Controllers
 
 
                     //var result = _passwordHasher.VerifyHashedPassword(user, user.Password, model.Password);
-                    var result = user.Password == model.Password ? true : false;
+                    var result = model.Password == user.Password ? true : false;
                     //if (result == PasswordVerificationResult.Success)
                     if (result)
                     {
+                        var role = _context.Roles.FirstOrDefault(c => c.Id == user.RoleId);
                         var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Role, role.Role1)
                     };
 
                         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

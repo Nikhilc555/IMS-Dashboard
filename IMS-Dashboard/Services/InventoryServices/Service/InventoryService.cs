@@ -4,6 +4,7 @@ using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Services.InventoryServices.Interface;
 using IMS_Dashboard.Services.ProductServices.Service;
 using IMS_Dashboard.ViewModels.InventoryVM;
+using IMS_Dashboard.ViewModels.ShipmentVM;
 using IMS_Dashboard.ViewModels.SuppliersVM;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -91,28 +92,6 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
             try
             {
-                //var response = await _httpClient.GetAsync("api/inventories");
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
-                //    if (inventories != null)
-                //    {
-                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
-                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
-
-                //        return inventories;
-                //    }
-                //    else
-                //    {
-                //        _logger.LogWarning("The API returned a null inventories list.");
-                //        return Enumerable.Empty<DisplayInventoryViewModel>();
-                //    }
-                //}
-                //else
-                //{
-                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
-                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
-                //}
 
                 var inventories = await _inventoryRepo.GetAll();
 
@@ -243,28 +222,6 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
             try
             {
-                //var response = await _httpClient.GetAsync("api/inventories");
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
-                //    if (inventories != null)
-                //    {
-                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
-                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
-
-                //        return inventories;
-                //    }
-                //    else
-                //    {
-                //        _logger.LogWarning("The API returned a null inventories list.");
-                //        return Enumerable.Empty<DisplayInventoryViewModel>();
-                //    }
-                //}
-                //else
-                //{
-                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
-                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
-                //}
 
                 var inventories = await _inventoryRepo.GetAllWithDate(from_date, to_date);
 
@@ -589,6 +546,66 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             {
                 _logger.LogError(ex, "An error occurred while deleting the inventory.");
                 return false;
+            }
+        }
+
+        public async Task<IEnumerable<ShipmentViewModel>> GetShipmentwithdate(string from_date, string to_date)
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<ShipmentViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+
+                var inventories = await _inventoryRepo.GetShipmentWithDate(from_date, to_date);
+
+                IEnumerable<ShipmentViewModel> inventoryList = new List<ShipmentViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories.ToList())
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        var Shipuser = await _userRepo.Get(inventory.Shipped_by);
+                        tempList.Add(new ShipmentViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            ShippingMark = inventory.ShippingMark,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.SupplierName,
+                            CreatedOn = inventory.CreatedOn,
+                            Created_by = user?.NameOfUser,
+                            ShippingRef = inventory.Shipping_ref,
+                            ShippedOn = inventory.Shipped_on,
+                            Shipped_by = Shipuser?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            from_date = from_date,
+                            to_date = to_date,
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
             }
         }
     }

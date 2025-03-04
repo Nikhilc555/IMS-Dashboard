@@ -34,16 +34,8 @@ namespace IMS_Dashboard.Controllers
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                if (from_date== null || to_date == null)
-                {
-                    var inventory = await _inventoryService.GetAllInventory();
-                    return View(inventory);
-                }
-                else
-                {
-                    var inventory = await _inventoryService.GetAllInventorywithdate(from_date, to_date);
-                    return View(inventory);
-                }
+                var inventory = await _inventoryService.GetAllInventorywithdate(from_date, to_date);
+                return View(inventory);
             }
             catch (HttpRequestException ex)
             {

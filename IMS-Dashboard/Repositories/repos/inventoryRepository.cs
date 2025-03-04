@@ -107,16 +107,37 @@ namespace IMS_Dashboard.Repositories.repos
 
             if (!string.IsNullOrEmpty(from_date) && !string.IsNullOrEmpty(to_date))
             {
-                if (DateTime.TryParse(from_date, out DateTime fromDate) &&
-                    DateTime.TryParse(to_date, out DateTime toDate))
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
                 {
-                    // Filter based on CreatedOn date
-                    inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive == "N");
+                    fromDate = DateTime.Today;
                 }
-                else
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
                 {
-                    return null;
+                    toDate = DateTime.Today;
                 }
+                // Filter based on CreatedOn date
+                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N");
+            }
+            else
+            {
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
+                {
+                    fromDate = DateTime.Today;
+                }
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
+                {
+                    toDate = DateTime.Today;
+                }
+
+                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N");
             }
 
             return inventory;
@@ -157,6 +178,48 @@ namespace IMS_Dashboard.Repositories.repos
             { 
                 return false;
             }
+        }
+
+        public async Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date)
+        {
+            var inventory = _context.ImportInventories.ToList().AsEnumerable().Where(i => i.Export_status);
+
+            if (!string.IsNullOrEmpty(from_date) && !string.IsNullOrEmpty(to_date))
+            {
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
+                {
+                    fromDate = DateTime.Today;
+                }
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
+                {
+                    toDate = DateTime.Today;
+                }
+                // Filter based on CreatedOn date
+                inventory = inventory.Where(i => i.Shipped_on >= fromDate && i.Shipped_on < toDate.AddDays(1) && i.IsActive != "N");
+            }
+            else
+            {
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
+                {
+                    fromDate = DateTime.Today;
+                }
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
+                {
+                    toDate = DateTime.Today;
+                }
+
+                inventory = inventory.Where(i => i.Shipped_on >= fromDate && i.Shipped_on < toDate.AddDays(1) && i.IsActive != "N");
+            }
+
+            return inventory;
         }
     }
 }
