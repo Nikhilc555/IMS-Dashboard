@@ -16,11 +16,14 @@
                     <thead>
                         <tr>
                             <th> # </th>
+                            <th> @Html.DisplayNameFor(model => model.shipment_mark) </th>
                             <th> @Html.DisplayNameFor(model => model.supplier_name) </th>
                             <th> @Html.DisplayNameFor(model => model.ContactName) </th>
                             <th> @Html.DisplayNameFor(model => model.PhoneNumber) </th>
                             <th> @Html.DisplayNameFor(model => model.Email) </th>
                             <th> @Html.DisplayNameFor(model => model.Address) </th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -31,11 +34,24 @@
                             {
                                 <tr>
                                     <td> @rowNumber </td>
+                                    <td> @suppliers.shipment_mark </td>
                                     <td> @suppliers.supplier_name </td>
                                     <td> @suppliers.ContactName </td>
                                     <td> @suppliers.PhoneNumber </td>
                                     <td> @suppliers.Email </td>
-                                    <td> @suppliers.Address, @suppliers.City, @suppliers.State, @suppliers.Country PINCODE - @suppliers.PostalCode </td>
+                                    <td> @suppliers.Address</td>
+                                    <td>
+                                        <form asp-action="EditSupplier" method="get">
+                                            <input type="hidden" name="id" value="@suppliers.id" />
+                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form asp-action="DeleteSupplier" method="post">
+                                            <input type="hidden" name="id" value="@suppliers.id" />
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 rowNumber++;
                             }

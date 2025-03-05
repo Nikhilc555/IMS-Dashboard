@@ -1,6 +1,7 @@
 ﻿using IMS_Dashboard.Models.Entities;
 using IMS_Dashboard.Models.Responses;
 using IMS_Dashboard.Repositories.interfaces;
+using IMS_Dashboard.Services.InventoryServices.Service;
 using IMS_Dashboard.Services.SupplierServices.Interface;
 using IMS_Dashboard.ViewModels.CategoryVM;
 using IMS_Dashboard.ViewModels.CustomersVM;
@@ -15,16 +16,19 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
     public class SupplierService : ISupplierService
     {
         private readonly IsupplierRepository _supplierRepo;
+        private readonly IuserRepository _userRepo;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SupplierService> _logger;
         private readonly IMemoryCache _cache;
         private const string cacheKey = "SupplierList";
-        public SupplierService(HttpClient httpClient, ILogger<SupplierService> logger, IMemoryCache cache, IsupplierRepository supplierRepo)
+        public SupplierService(HttpClient httpClient, ILogger<SupplierService> logger, IMemoryCache cache, IsupplierRepository supplierRepo, IuserRepository userRepo)
         {
             _httpClient = httpClient;
             _logger = logger;
             _cache = cache;
             _supplierRepo = supplierRepo;
+            _userRepo = userRepo;
+
         }
 
         public async Task<IEnumerable<DisplaySupplierViewModel>> GetAllSuppliers()
@@ -64,7 +68,12 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
                 return suppliers.Select(c => new DisplaySupplierViewModel
                 {
                     id = c.Id,
-                    supplier_name = c.SupplierName
+                    shipment_mark = c.ShipmentMarks,
+                    supplier_name = c.SupplierName,
+                    ContactName = c.ContactPerson,
+                    PhoneNumber = c.Phone,
+                    Email = c.Email,
+                    Address = c.Address
                 }).ToList();
             }
             catch(HttpRequestException httpEx)
@@ -153,6 +162,147 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
             }
 
             return supplierCount;
+        }
+
+        public async Task<DisplaySupplierViewModel> GetSupplierById(int id)
+        {
+            if (_cache.TryGetValue(cacheKey, out DisplaySupplierViewModel cachedsupplier))
+            {
+                _logger.LogInformation("Returning cached supplier list.");
+                return cachedsupplier;
+            }
+
+            try
+            {
+
+                var suppliers = await _supplierRepo.Get(id);
+
+
+                var created_by = await _userRepo.Get(suppliers.CreatedBy);
+
+                DisplaySupplierViewModel user = new DisplaySupplierViewModel();
+                if (suppliers != null)
+                {
+                    user = new DisplaySupplierViewModel
+                    {
+                        id = suppliers.Id,
+                        shipment_mark = suppliers.ShipmentMarks,
+                        supplier_name = suppliers.SupplierName,
+                        ContactName = suppliers.ContactPerson,
+                        PhoneNumber = suppliers.Phone,
+                        Email = suppliers.Email,
+                        Address = suppliers.Address,
+                        CreatedOn = suppliers.CreatedOn,
+                        CreatedBy = created_by.NameOfUser
+                    };
+
+                }
+
+                return user;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the supplier API.");
+                throw new InventoryServiceException("Network error occurred while fetching supplier.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllsupplier");
+                throw new InventoryServiceException("An unexpected error occurred while fetching supplier.", ex);
+            }
+        }
+
+        public async Task<bool> CreateSupplier(AddSupplierViewModel supplierViewModel)
+        {
+            if (supplierViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(supplierViewModel));
+            }
+
+            try
+            {
+                var supplierToCreate = new Suppliers
+                {
+                    ShipmentMarks = supplierViewModel.ShipmentMark,
+                    SupplierName = supplierViewModel.SupplierName,
+                    ContactPerson = supplierViewModel.ContactName,
+                    Phone = supplierViewModel.PhoneNumber,
+                    Email = supplierViewModel.Email,
+                    Address = supplierViewModel.Address,
+                    IsActive = true,
+                    CreatedOn = DateTime.UtcNow
+                };
+
+                _logger.LogInformation("Sending request to create a new supplier.");
+
+                await _supplierRepo.Create(supplierToCreate);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the supplier.");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateSupplier(AddSupplierViewModel supplierViewModel)
+        {
+            if (supplierViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(supplierViewModel));
+            }
+
+            try
+            {
+
+                var supplierToUpdate = new Suppliers
+                {
+                    Id = supplierViewModel.Id,
+                    ShipmentMarks = supplierViewModel.ShipmentMark,
+                    SupplierName = supplierViewModel.SupplierName,
+                    ContactPerson = supplierViewModel.ContactName,
+                    Phone = supplierViewModel.PhoneNumber,
+                    Email = supplierViewModel.Email,
+                    Address = supplierViewModel.Address,
+                    IsActive = true,
+                    UpdatedOn = DateTime.UtcNow
+                };
+
+                _logger.LogInformation("Sending request to update an supplier.");
+
+                await _supplierRepo.Update(supplierToUpdate);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the supplier.");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteSupplier(int id)
+        {
+            if (id == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            try
+            {
+
+                _logger.LogInformation("Sending request to delete an supplier.");
+
+                await _supplierRepo.Delete(id);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the supplier.");
+                return false;
+            }
         }
     }
 

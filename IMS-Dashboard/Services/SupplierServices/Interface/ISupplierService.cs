@@ -7,5 +7,9 @@ namespace IMS_Dashboard.Services.SupplierServices.Interface
         Task<int> GetAllSuppliersCountAsync();
         Task<IEnumerable<DisplaySupplierViewModel>> GetAllSuppliers();
         Task<CreateSupplierViewModel> CreateSupplier(CreateSupplierViewModel supplierViewModel);
+        Task<DisplaySupplierViewModel> GetSupplierById(int id);
+        Task<bool> CreateSupplier(AddSupplierViewModel supplierViewModel);
+        Task<bool> UpdateSupplier(AddSupplierViewModel supplierViewModel);
+        Task<bool> DeleteSupplier(int id);
     }
 }

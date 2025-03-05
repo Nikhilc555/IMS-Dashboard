@@ -7,5 +7,8 @@ namespace IMS_Dashboard.Repositories.interfaces
 
         Task<Suppliers> Get(int? Id);
         Task<IEnumerable<Suppliers>> GetAll();
+        Task Create(Suppliers supplier);
+        Task Update(Suppliers supplier);
+        Task Delete(int id);
     }
 }

@@ -13,5 +13,19 @@ namespace IMS_Dashboard.Models.Entities
         public DateTime? CreatedOn { get; set; }
         [Column("created_by")]
         public int? CreatedBy { get; set; }
+        [Column("shipment_marks")]
+        public string? ShipmentMarks { get; set; }
+        [Column("contact_person")]
+        public string? ContactPerson { get; set; }
+        [Column("phone")]
+        public string? Phone { get; set; }
+        [Column("email")]
+        public string? Email { get; set; }
+        [Column("address")]
+        public string? Address { get; set; }
+        [Column("updated_on")]
+        public DateTime? UpdatedOn { get; set; }
+        [Column("updated_by")]
+        public int? UpdatedBy { get; set; }
     }
 }

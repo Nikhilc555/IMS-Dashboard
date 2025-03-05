@@ -40,5 +40,20 @@ namespace IMS_Dashboard.ViewModels.SuppliersVM
 
         [Display(Name = "Supplier Name")]
         public string supplier_name { get; set; }
+
+        [Display(Name = "Shipment Mark")]
+        public string shipment_mark { get; set; }
+
+        [Display(Name = "Created On")]
+        public DateTime? CreatedOn { get; set; }
+
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
+
+        [Display(Name = "Updated On")]
+        public DateTime? UpdatedOn { get; set; }
+
+        [Display(Name = "Updated By")]
+        public string UpdatedBy { get; set; }
     }
 }
