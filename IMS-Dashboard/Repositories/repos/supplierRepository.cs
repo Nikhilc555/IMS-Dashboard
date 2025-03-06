@@ -84,5 +84,11 @@ namespace IMS_Dashboard.Repositories.repos
                 await _context.SaveChangesAsync();
             }
         }
+
+        public Task<int> GetActiveSupplierCount()
+        {
+            var supplier = _context.Suppliers.ToList().Where(s => s.IsActive == true).Count();
+            return Task.FromResult(supplier);
+        }
     }
 }

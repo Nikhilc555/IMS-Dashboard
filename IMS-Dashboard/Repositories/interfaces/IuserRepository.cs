@@ -6,6 +6,7 @@ namespace IMS_Dashboard.Repositories.interfaces
     {
         Task<SystemUser> Get(int? Id);
         Task<IEnumerable<SystemUser>> GetAll();
+        Task<int> GetActiveUserCount();
         Task Create(SystemUser user);
         Task Update(SystemUser inv);
         Task Delete(int id);

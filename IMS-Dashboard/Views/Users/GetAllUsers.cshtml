@@ -18,8 +18,8 @@
                             <th> @Html.DisplayNameFor(model => model.name) </th>
                             <th> @Html.DisplayNameFor(model => model.user_name) </th>
                             <th> @Html.DisplayNameFor(model => model.role) </th>
-                            <th></th>
-                            <th></th>
+                            <th class="tdcontrol"></th>
+                            <th class="tdcontrol"></th>
                         </tr>
                     </thead>
                     <tbody id="inventoryTableBody">
@@ -33,13 +33,13 @@
                                     <td> @user.name </td>
                                     <td> @user.user_name </td>
                                     <td> @user.role </td>
-                                    <td>
+                                    <td class="tdcontrol">
                                         <form asp-action="EditUser" method="get">
                                             <input type="hidden" name="id" value="@user.id" />
                                             <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                         </form>
                                     </td>
-                                    <td>
+                                    <td class="tdcontrol">
                                         <form asp-action="DeleteUser" method="post">
                                             <input type="hidden" name="id" value="@user.id" />
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>

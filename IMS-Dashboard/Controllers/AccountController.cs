@@ -24,6 +24,7 @@ namespace IMS_Dashboard.Controllers
             _passwordHasher = new PasswordHasher<SystemUser>();
         }
 
+        [IgnoreAntiforgeryToken]
         [HttpGet]
         public IActionResult Login()
         {

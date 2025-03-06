@@ -9,44 +9,77 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 
-                <div class="form-group">
+                <div class="row">
                     <div class="col-md-6">
+                        @* <div class="col-md-6">
                         <label asp-for="ShippingMark" class="control-label"></label>
                         <input asp-for="ShippingMark" type="text" class="form-control"
                                placeholder="Enter Shipping Mark.." id="ShippingMark">
                         <span asp-validation-for="ShippingMark" class="text-danger"></span>
+                    </div> *@
+                        <div class="form-group row">
+                            <label asp-for="CTNNo" class="control-label"></label>
+                            <div class="col-sm-9">
+                                <input asp-for="CTNNo" type="number" class="form-control"
+                                       placeholder="Enter CTN No.." id="CTNNo">
+                                <span asp-validation-for="CTNNo" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="CTNNo" class="control-label"></label>
-                        <input asp-for="CTNNo" type="number" class="form-control"
-                               placeholder="Enter CTN No.." id="CTNNo">
-                        <span asp-validation-for="CTNNo" class="text-danger"></span>
+                        <div class="form-group row">
+                            <label asp-for="SupplierId" class="control-label"> Shipment Mark</label>
+                            <div class="col-sm-9">
+                                <select class="form-select" asp-for="SupplierId" asp-items="@Model.Suppliers"></select>
+                                <span asp-validation-for="SupplierId" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
-                        <label asp-for="SupplierId" class="control-label"></label>
-                        <select class="form-select" asp-for="SupplierId" asp-items="@Model.Suppliers"></select>
-                        <span asp-validation-for="SupplierId" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
+                        @* <div class="col-md-6">
                         <label asp-for="ProductId" class="control-label"></label>
                         <select class="form-select" asp-for="ProductId" asp-items="@Model.Products"></select>
                         <span asp-validation-for="ProductId" class="text-danger"></span>
+                    </div> *@
+                        <div class="form-group row">
+                            <label asp-for="Description" class="control-label"></label>
+                            <div class="col-sm-9">
+                                <input asp-for="Description" type="text" class="form-control"
+                                       placeholder="Enter Description.." id="Description">
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="QuantityAdded" class="control-label"></label>
-                        <input asp-for="QuantityAdded" type="number" class="form-control"
-                               placeholder="Enter Quantity want to be added.." id="QuantityAdded">
-                        <span asp-validation-for="QuantityAdded" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="Weight" class="control-label"></label>
-                        <input asp-for="Weight" type="number" class="form-control"
-                               placeholder="Enter Weight.." id="Weight">
-                        <span asp-validation-for="Weight" class="text-danger"></span>
+                        <div class="form-group row">
+                            <label asp-for="QuantityAdded" class="control-label"></label>
+                            <div class="col-sm-9">
+                                <input asp-for="QuantityAdded" type="number" class="form-control"
+                                       placeholder="Enter Quantity want to be added.." id="QuantityAdded">
+                                <span asp-validation-for="QuantityAdded" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label asp-for="Weight" class="control-label"></label>
+                            <div class="col-sm-9">
+                                <input asp-for="Weight" type="number" class="form-control"
+                                       placeholder="Enter Weight.." id="Weight" step="any">
+                                <span asp-validation-for="Weight" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <input type="hidden" asp-for="Id"/>
-                <button type="submit" class="btn btn-primary">Update Inventory</button>
+                <button type="submit" class="btn btn-black">Update Inventory</button>
             </form>
         </div>
     </div>

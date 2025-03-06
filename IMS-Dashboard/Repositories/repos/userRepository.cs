@@ -96,5 +96,11 @@ namespace IMS_Dashboard.Repositories.repos
 
             }
         }
+
+        public Task<int> GetActiveUserCount()
+        {
+            var user = _context.SystemUsers.ToList().Where(s => s.IsActive == true).Count();
+            return Task.FromResult(user);
+        }
     }
 }

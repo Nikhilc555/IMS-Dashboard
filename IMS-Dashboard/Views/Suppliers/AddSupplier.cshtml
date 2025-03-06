@@ -3,8 +3,8 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Create Product</h4>
-            @* <p class="card-description"> Basic form elements </p> *@
+            <h4 class="card-title">Create Supplier</h4>
+
             <form asp-action="AddSupplier" class="forms-sample" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -71,8 +71,8 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary me-2">Submit</button>
-                <button class="btn btn-light">Cancel</button>
+                <button type="submit" class="btn btn-black me-2">Submit</button>
+                @* <button class="btn btn-light">Cancel</button> *@
 
             </form>
         </div>

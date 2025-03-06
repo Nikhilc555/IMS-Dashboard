@@ -126,40 +126,45 @@ namespace IMS_Dashboard.Services.SupplierServices.Service
 
         public async Task<int> GetAllSuppliersCountAsync()
         {
-            if (!_cache.TryGetValue("supplierCount", out int supplierCount))
-            {
+            int supplierCount = 0;
+            //if (!_cache.TryGetValue("supplierCount", out int supplierCount))
+            //{
                 try
                 {
-                    var response = await _httpClient.GetAsync("api/suppliers/GetAllSuppliersCount");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseData = await response.Content.ReadFromJsonAsync<ApiResponseDto<int>>();
-                        if (responseData != null && responseData.Success)
-                        {
-                            supplierCount = responseData.Data;
+                    supplierCount = _supplierRepo.GetActiveSupplierCount().Result;
 
-                            _cache.Set("supplierCount", supplierCount, TimeSpan.FromMinutes(5));
+                    _cache.Set("supplierCount", supplierCount, TimeSpan.FromMinutes(5));
 
-                            return supplierCount;
-                        }
-                        else
-                        {
-                            _logger.LogWarning($"Failed to retrieved supplier count. {responseData?.Message}");
-                            throw new Exception("Failed to retrieved supplier count.");
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogError($"Error response from API, Status Code: {response.StatusCode}");
-                        throw new Exception("An error occurred while contacting the API.");
-                    }
+                    //var response = await _httpClient.GetAsync("api/suppliers/GetAllSuppliersCount");
+                    //if (response.IsSuccessStatusCode)
+                    //{
+                    //    var responseData = await response.Content.ReadFromJsonAsync<ApiResponseDto<int>>();
+                    //    if (responseData != null && responseData.Success)
+                    //    {
+                    //        supplierCount = responseData.Data;
+
+                    //        _cache.Set("supplierCount", supplierCount, TimeSpan.FromMinutes(5));
+
+                    //        return supplierCount;
+                    //    }
+                    //    else
+                    //    {
+                    //        _logger.LogWarning($"Failed to retrieved supplier count. {responseData?.Message}");
+                    //        throw new Exception("Failed to retrieved supplier count.");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    _logger.LogError($"Error response from API, Status Code: {response.StatusCode}");
+                    //    throw new Exception("An error occurred while contacting the API.");
+                    //}
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "An error occurred while getting supplier count.");
                     throw;
                 }
-            }
+            //}
 
             return supplierCount;
         }

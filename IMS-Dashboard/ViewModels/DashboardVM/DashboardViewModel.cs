@@ -12,6 +12,9 @@ namespace IMS_Dashboard.ViewModels.DashboardVM
         public int SupplierCount { get; set; }
         public int InventoryCount { get; set; }
         public int OrderCount { get; set; }
+        public int UserCount { get; set; }
+        public int ShippedCount { get; set; }
+        public int PendingCount { get; set; }
         public int PendingOrderCount { get; set; }
         public int CompletedOrderCount { get; set; }
         public int DeliveredOrderCount { get; set; }

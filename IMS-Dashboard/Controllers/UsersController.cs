@@ -70,7 +70,7 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddInventory(AddUserViewModel userViewModel)
+        public async Task<IActionResult> AddUser(AddUserViewModel userViewModel)
         {
             if (!ModelState.IsValid)
             {

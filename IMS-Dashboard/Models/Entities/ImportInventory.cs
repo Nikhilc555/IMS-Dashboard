@@ -12,11 +12,14 @@ public partial class ImportInventory
     [Column("ctn_no")]
     public int? CtnNo { get; set; }
 
-    [Column("shipping_mark")]
-    public string? ShippingMark { get; set; }
+    //[Column("shipping_mark")]
+    //public string? ShippingMark { get; set; }
 
     [Column("supplier_id")]
     public int? SupplierId { get; set; }
+
+    [Column("description")]
+    public string? Description { get; set; }
 
     [Column("product_id")]
     public int? ProductId { get; set; }

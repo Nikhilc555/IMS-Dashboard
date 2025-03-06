@@ -3,6 +3,8 @@ using IMS_Dashboard.Services.InventoryServices.Interface;
 using IMS_Dashboard.Services.OrderServices.Interface;
 using IMS_Dashboard.Services.ProductServices.Interface;
 using IMS_Dashboard.Services.SupplierServices.Interface;
+using IMS_Dashboard.Services.UserServices.Interface;
+using IMS_Dashboard.Services.UserServices.Service;
 using IMS_Dashboard.ViewModels.CustomersVM;
 using IMS_Dashboard.ViewModels.DashboardVM;
 using IMS_Dashboard.ViewModels.InventoryVM;
@@ -21,17 +23,19 @@ namespace IMS_Dashboard.Controllers
         private readonly ISupplierService _supplierService;
         private readonly IInventoryService _inventoryService;
         private readonly IOrderService _orderService;
+        private readonly IuserService _userService;
 
         private readonly ILogger<HomeController> _logger;
         public HomeController(ILogger<HomeController> logger, ICustomerService customerService, 
             IProductService productService, ISupplierService supplierService, IInventoryService inventoryService,
-            IOrderService orderService)
+            IOrderService orderService, IuserService userService)
         {
             _customerService = customerService;
             _productService = productService;
             _supplierService = supplierService;
             _inventoryService = inventoryService;
             _orderService = orderService;
+            _userService = userService;
 
             _logger = logger;
         }
@@ -42,7 +46,10 @@ namespace IMS_Dashboard.Controllers
             {
                 //var customerCount = await _customerService.GetAllCustomersCountAsync();
                 //var productCount = await _productService.GetAllProductsCount();
-                //var supplierCount = await _supplierService.GetAllSuppliersCountAsync();
+                var supplierCount = await _supplierService.GetAllSuppliersCountAsync();
+                var userCount = await _userService.GetAllUserCountAsync();
+                var shippedCount = await _inventoryService.GetShippedInventoryCountAsync();
+                var pendingCount = await _inventoryService.GetPendingInventoryCountAsync();
                 //var inventoryCount = await _inventoryService.GetAllInventoryCount();
                 //var orderCount = await _orderService.GetAllOrdersCount();
                 //var pendingOrderCount = await _orderService.GetOrdersCountByOrderStatus("Pending");
@@ -60,7 +67,10 @@ namespace IMS_Dashboard.Controllers
                 {
                     CustomerCount = 0,
                     ProductCount = 0,
-                    SupplierCount = 0,
+                    SupplierCount = supplierCount,
+                    UserCount = userCount,
+                    ShippedCount = shippedCount,
+                    PendingCount = pendingCount,
                     InventoryCount = 0,
                     OrderCount = 0,
                     PendingOrderCount = 0,

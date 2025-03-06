@@ -15,7 +15,7 @@
                     <div class="col-md-6">
                         <label for="ShippingRef" class="control-label"></label>
                         <input for="ShippingRef" name="shippingRef" type="text" class="form-control"
-                               placeholder="Enter Shipping Mark.." id="ShippingRef">
+                               placeholder="Enter Shipping Ref.." id="ShippingRef">
                         <span validation-for="ShippingRef" class="text-danger"></span>
                     </div>
                     <table class="table table-bordered">
@@ -23,9 +23,10 @@
                             <tr>
                                 <th> # </th>
                                 <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                                <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
-                                <th> @Html.DisplayNameFor(model => model.Product) </th>
+                                @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                                @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
                                 <th> @Html.DisplayNameFor(model => model.Supplier) </th>
+                                <th> @Html.DisplayNameFor(model => model.Description) </th>
                                 <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                                 <th> @Html.DisplayNameFor(model => model.Weight) </th>
                                 <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
@@ -42,9 +43,10 @@
                                     <tr data-id="@inventory.Id">
                                         <td> @rowNumber </td>
                                         <td> @inventory.CTNNo </td>
-                                        <td> @inventory.ShippingMark </td>
-                                        <td> @inventory.Product </td>
+                                        @* <td> @inventory.ShippingMark </td> *@
+                                        @* <td> @inventory.Product </td> *@
                                         <td> @inventory.Supplier </td>
+                                        <td> @inventory.Description </td>
                                         <td> @inventory.Quantity </td>
                                         <td> @inventory.Weight </td>
                                         <td> @inventory.CreatedOn </td>
@@ -61,7 +63,7 @@
 
                     <input type="hidden" id="updatedInventoryForShipment" name="updatedInventoryForShipment" />
 
-                    <button type="submit" class="btn btn-primary" id="submitForShipment">Submit Changes</button>
+                    <button type="submit" class="btn btn-black" id="submitForShipment">Submit Changes</button>
                 </form>
             </div>
         </div>

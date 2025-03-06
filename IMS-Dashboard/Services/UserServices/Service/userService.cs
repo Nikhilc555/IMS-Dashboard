@@ -201,5 +201,25 @@ namespace IMS_Dashboard.Services.UserServices.Service
             }
         }
 
+        public async Task<int> GetAllUserCountAsync()
+        {
+            int userCount = 0;
+            //if (!_cache.TryGetValue("supplierCount", out int supplierCount))
+            //{
+            try
+            {
+                userCount = _userRepo.GetActiveUserCount().Result;
+
+                _cache.Set("userCount", userCount, TimeSpan.FromMinutes(5));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting user count.");
+                throw;
+            }
+            //}
+
+            return userCount;
+        }
     }
 }

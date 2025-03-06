@@ -31,10 +31,10 @@
                             <input type="text" name="to_date" class="form-control" value="@to_date">
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
 
-                        <button type="submit" class="btn btn-primary"><i class="icon-search"></i></button>
-                        <button type="button" id="downloadExcel" class="btn btn-primary">Excel</button>
+                        <button type="submit" class="btn btn-black"><i class="icon-search"></i></button>
+                        <button type="button" id="downloadExcel" class="btn btn-black">Download Excel</button>
                     </div>
                     @* <div class="col-md-2">
                         <button type="button" class="btn btn-success" style="float:right;" onclick="window.location.href='@Url.Action("AddInventory", "Inventories")'">
@@ -50,9 +50,10 @@
                             <th> # </th>
                             <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
                             <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
-                            <th> @Html.DisplayNameFor(model => model.Product) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                            @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
                             <th> @Html.DisplayNameFor(model => model.Supplier) </th>
+                            <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
@@ -71,9 +72,10 @@
                                     <td> @rowNumber </td>
                                     <td> @inventory.ShippingRef </td>
                                     <td> @inventory.CTNNo </td>
-                                    <td> @inventory.ShippingMark </td>
-                                    <td> @inventory.Product </td>
+                                    @* <td> @inventory.ShippingMark </td> *@
+                                    @* <td> @inventory.Product </td> *@
                                     <td> @inventory.Supplier </td>
+                                    <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
                                     <td> @inventory.CreatedOn </td>

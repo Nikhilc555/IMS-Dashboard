@@ -9,12 +9,13 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Display(Name = "CTN No")]
         public int? CTNNo { get; set; }
 
-        [Display(Name = "Shipping Mark")]
-        public string ShippingMark { get; set; }
+        //[Display(Name = "Shipping Mark")]
+        //public string ShippingMark { get; set; }
+        public string? Description { get; set; }
         public int? ProductId { get; set; }
         public int? SupplierId { get; set; }
 
-        [Display(Name = "Supplier Name")]
+        [Display(Name = "Shipment Mark")]
         public string Supplier { get; set; }
 
         [Display(Name = "Product Name")]

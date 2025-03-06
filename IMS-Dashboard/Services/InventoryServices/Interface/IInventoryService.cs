@@ -18,5 +18,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<bool> UpdateInventoryForShipment(List<int> remainingIds, string shippingRef);
         Task<bool> EditInventory(AddInventoryViewModel inventoryViewModel);
         Task<bool> DeleteInventory(int id);
+        Task<int> GetShippedInventoryCountAsync();
+        Task<int> GetPendingInventoryCountAsync();
     }
 }

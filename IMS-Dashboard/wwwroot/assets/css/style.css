@@ -30432,3 +30432,14 @@ dl li {
   outline: 1px solid slategrey;
 }
 /*# sourceMappingURL=maps/style.css.map */
+
+.btn-red {
+    background: #D20C18;
+}
+.btn-black {
+    background: #000000;
+    color : #FFFFFF;
+}
+.tdcontrol{
+    width:5%;
+}

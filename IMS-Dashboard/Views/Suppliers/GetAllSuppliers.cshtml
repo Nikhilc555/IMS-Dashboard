@@ -22,8 +22,8 @@
                             <th> @Html.DisplayNameFor(model => model.PhoneNumber) </th>
                             <th> @Html.DisplayNameFor(model => model.Email) </th>
                             <th> @Html.DisplayNameFor(model => model.Address) </th>
-                            <th></th>
-                            <th></th>
+                            <th class="tdcontrol"></th>
+                            <th class="tdcontrol"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,13 +40,13 @@
                                     <td> @suppliers.PhoneNumber </td>
                                     <td> @suppliers.Email </td>
                                     <td> @suppliers.Address</td>
-                                    <td>
+                                    <td class="tdcontrol">
                                         <form asp-action="EditSupplier" method="get">
                                             <input type="hidden" name="id" value="@suppliers.id" />
                                             <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                         </form>
                                     </td>
-                                    <td>
+                                    <td class="tdcontrol">
                                         <form asp-action="DeleteSupplier" method="post">
                                             <input type="hidden" name="id" value="@suppliers.id" />
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>

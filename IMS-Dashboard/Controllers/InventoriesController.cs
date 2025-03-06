@@ -73,12 +73,13 @@ namespace IMS_Dashboard.Controllers
             var inventory = await _inventoryService.GetInventoryById(id);
 
             addInventoryViewModel.Id = inventory.Id;
-            addInventoryViewModel.CTNNo = inventory.CTNNo;
-            addInventoryViewModel.ShippingMark = inventory.ShippingMark;
+            addInventoryViewModel.CTNNo = inventory.CTNNo ?? 0;
+            //addInventoryViewModel.ShippingMark = inventory.ShippingMark;
             addInventoryViewModel.ProductId = inventory.ProductId;
-            addInventoryViewModel.SupplierId = inventory.SupplierId;
-            addInventoryViewModel.QuantityAdded = inventory.Quantity;
-            addInventoryViewModel.Weight = inventory.Weight;
+            addInventoryViewModel.Description = inventory.Description;
+            addInventoryViewModel.SupplierId = inventory.SupplierId ?? 0;
+            addInventoryViewModel.QuantityAdded = inventory.Quantity ?? 0;
+            addInventoryViewModel.Weight = inventory.Weight ?? 0;
             // Fetch dropdowns from the API
             await PopulateDropDownsNew(addInventoryViewModel);
             return View(addInventoryViewModel);

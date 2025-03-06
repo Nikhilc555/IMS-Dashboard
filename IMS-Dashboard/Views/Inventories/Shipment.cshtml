@@ -18,9 +18,10 @@
                         <tr>
                             <th> # </th>
                             <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
-                            <th> @Html.DisplayNameFor(model => model.Product) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                            @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
                             <th> @Html.DisplayNameFor(model => model.Supplier) </th>
+                            <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
@@ -36,9 +37,10 @@
                                 <tr>
                                     <td> @rowNumber </td>
                                     <td> @inventory.CTNNo </td>
-                                    <td> @inventory.ShippingMark </td>
-                                    <td> @inventory.Product </td>
+                                    @* <td> @inventory.ShippingMark </td> *@
+                                    @* <td> @inventory.Product </td> *@
                                     <td> @inventory.Supplier </td>
+                                    <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
                                     <td> @inventory.CreatedOn </td>

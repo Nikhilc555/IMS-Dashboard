@@ -42,8 +42,9 @@ namespace IMS_Dashboard.Repositories.repos
                 {
                     // Update properties
                     existingInv.CtnNo = inv.CtnNo;
-                    existingInv.ShippingMark = inv.ShippingMark;
+                    //existingInv.ShippingMark = inv.ShippingMark;
                     existingInv.SupplierId = inv.SupplierId;
+                    existingInv.Description = inv.Description;
                     existingInv.ProductId = inv.ProductId;
                     existingInv.Qty = inv.Qty;
                     existingInv.Weight = inv.Weight;
@@ -220,6 +221,18 @@ namespace IMS_Dashboard.Repositories.repos
             }
 
             return inventory;
+        }
+
+        public Task<int> GetShippedInventoryCount()
+        {
+            var ship_inventory = _context.ImportInventories.ToList().Where(s => s.Export_status == true).Sum(s => s.Qty) ?? 0;
+            return Task.FromResult(ship_inventory);
+        }
+
+        public Task<int> GetPendingInventoryCount()
+        {
+            var ship_inventory = _context.ImportInventories.ToList().Where(s => s.Export_status == false && s.IsActive == "Y").Sum(s => s.Qty) ?? 0;
+            return Task.FromResult(ship_inventory);
         }
     }
 }

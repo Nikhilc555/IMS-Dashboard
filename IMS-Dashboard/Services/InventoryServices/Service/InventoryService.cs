@@ -108,7 +108,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         {
                             Id = inventory.Id,
                             CTNNo = inventory.CtnNo,
-                            ShippingMark = inventory.ShippingMark,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
@@ -146,28 +147,6 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
             try
             {
-                //var response = await _httpClient.GetAsync("api/inventories");
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    var inventories = await response.Content.ReadFromJsonAsync<IEnumerable<DisplayInventoryViewModel>>();
-                //    if (inventories != null)
-                //    {
-                //        _cache.Set(cacheKey, inventories, TimeSpan.FromMinutes(5));
-                //        _logger.LogInformation("Inventories List successfully retrieved and cached.");
-
-                //        return inventories;
-                //    }
-                //    else
-                //    {
-                //        _logger.LogWarning("The API returned a null inventories list.");
-                //        return Enumerable.Empty<DisplayInventoryViewModel>();
-                //    }
-                //}
-                //else
-                //{
-                //    _logger.LogError($"Error fetching inventories from API. Status Code: {response.StatusCode}");
-                //    throw new InventoryServiceException("Failed to retrieved inventories from the API.");
-                //}
 
                 var inventories = await _inventoryRepo.GetAllPending();
 
@@ -184,7 +163,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         {
                             Id = inventory.Id,
                             CTNNo = inventory.CtnNo,
-                            ShippingMark = inventory.ShippingMark,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
@@ -238,7 +218,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         {
                             Id = inventory.Id,
                             CTNNo = inventory.CtnNo,
-                            ShippingMark = inventory.ShippingMark,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
@@ -400,7 +381,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                 var inventoryToCreate = new ImportInventory
                 {
                     CtnNo = inventoryViewModel.CTNNo,
-                    ShippingMark = inventoryViewModel.ShippingMark,
+                    //ShippingMark = inventoryViewModel.ShippingMark,
+                    Description = inventoryViewModel?.Description,
                     ProductId = inventoryViewModel.ProductId,
                     Qty = inventoryViewModel.QuantityAdded,
                     Weight = inventoryViewModel.Weight,
@@ -467,7 +449,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         {
                             Id = inventories.Id,
                             CTNNo = inventories.CtnNo,
-                            ShippingMark = inventories.ShippingMark,
+                            //ShippingMark = inventories.ShippingMark,
+                            Description = inventories?.Description,
                             ProductId = inventories?.ProductId,
                             Quantity = inventories.Qty,
                             Weight = inventories.Weight,
@@ -504,7 +487,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                 {
                     Id = inventoryViewModel.Id,
                     CtnNo = inventoryViewModel.CTNNo,
-                    ShippingMark = inventoryViewModel.ShippingMark,
+                    //ShippingMark = inventoryViewModel.ShippingMark,
+                    Description = inventoryViewModel?.Description,
                     ProductId = inventoryViewModel.ProductId,
                     Qty = inventoryViewModel.QuantityAdded,
                     Weight = inventoryViewModel.Weight,
@@ -576,7 +560,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         {
                             Id = inventory.Id,
                             CTNNo = inventory.CtnNo,
-                            ShippingMark = inventory.ShippingMark,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
@@ -607,6 +592,48 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                 _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
                 throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
             }
+        }
+
+        public async Task<int> GetShippedInventoryCountAsync()
+        {
+            int shippedInventoryCount = 0;
+            //if (!_cache.TryGetValue("shippedInventoryCount", out int shippedInventoryCount))
+            //{
+            try
+            {
+                shippedInventoryCount = _inventoryRepo.GetShippedInventoryCount().Result;
+
+                _cache.Set("shippedInventoryCount", shippedInventoryCount, TimeSpan.FromMinutes(5));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting shipped inventory count.");
+                throw;
+            }
+            //}
+
+            return shippedInventoryCount;
+        }
+
+        public async Task<int> GetPendingInventoryCountAsync()
+        {
+            int pendingInventoryCount = 0;
+            //if (!_cache.TryGetValue("pendingInventoryCount", out int pendingInventoryCount))
+            //{
+            try
+            {
+                pendingInventoryCount = _inventoryRepo.GetPendingInventoryCount().Result;
+
+                _cache.Set("shippedInventoryCount", pendingInventoryCount, TimeSpan.FromMinutes(5));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting oending inventory count.");
+                throw;
+            }
+            //}
+
+            return pendingInventoryCount;
         }
     }
 
