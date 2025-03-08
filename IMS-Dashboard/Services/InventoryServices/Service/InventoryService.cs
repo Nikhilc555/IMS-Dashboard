@@ -635,6 +635,46 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
 
             return pendingInventoryCount;
         }
+        public async Task<int> GetShipmentCountAsync()
+        {
+            int shipmentCount = 0;
+            //if (!_cache.TryGetValue("shippedInventoryCount", out int shippedInventoryCount))
+            //{
+            try
+            {
+                shipmentCount = _inventoryRepo.GetShipmentCountAsync().Result;
+
+                _cache.Set("shipmentCount", shipmentCount, TimeSpan.FromMinutes(5));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting shipment count.");
+                throw;
+            }
+            //}
+
+            return shipmentCount;
+        }
+        public async Task<int> GetPendingShipmentCountAsync()
+        {
+            int pendingshipmentCount = 0;
+            //if (!_cache.TryGetValue("shippedInventoryCount", out int shippedInventoryCount))
+            //{
+            try
+            {
+                pendingshipmentCount = _inventoryRepo.GetPendingShipmentCountAsync().Result;
+
+                _cache.Set("pendingshipmentCount", pendingshipmentCount, TimeSpan.FromMinutes(5));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting shipment count.");
+                throw;
+            }
+            //}
+
+            return pendingshipmentCount;
+        }
     }
 
     public class InventoryServiceException : Exception

@@ -2,6 +2,7 @@
 using IMS_Dashboard.ViewModels.InventoryVM;
 using IMS_Dashboard.ViewModels.OrderVM;
 using IMS_Dashboard.ViewModels.SuppliersVM;
+using IMS_Dashboard.Models.Entities;
 
 namespace IMS_Dashboard.ViewModels.DashboardVM
 {
@@ -24,5 +25,7 @@ namespace IMS_Dashboard.ViewModels.DashboardVM
         public IEnumerable<DisplaySupplierViewModel>? top5Suppliers { get; set; }
         public IEnumerable<DisplayRecentOrdersViewModel>? recentOrders { get; set; }
         public IEnumerable<DisplayRecentInventoryViewModel>? recentInventory { get; set; }
+        public IEnumerable<DailyQtyReport>? dailyInventory { get; set; }
+        public IEnumerable<DailyQtyReport>? previousInventory { get; set; }
     }
 }

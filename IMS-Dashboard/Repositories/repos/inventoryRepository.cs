@@ -1,6 +1,7 @@
 ﻿using Humanizer;
 using IMS_Dashboard.Models.Entities;
 using IMS_Dashboard.Repositories.interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace IMS_Dashboard.Repositories.repos
@@ -233,6 +234,24 @@ namespace IMS_Dashboard.Repositories.repos
         {
             var ship_inventory = _context.ImportInventories.ToList().Where(s => s.Export_status == false && s.IsActive == "Y").Sum(s => s.Qty) ?? 0;
             return Task.FromResult(ship_inventory);
+        }
+
+        public async Task<int> GetShipmentCountAsync()
+        {
+            return await _context.ImportInventories
+                .Where(i => i.Export_status)
+                .Select(i => i.Shipping_ref) // Select only shipping_ref
+                .Distinct() // Get distinct values
+                .CountAsync(); // Count them
+        }
+
+        public async Task<int> GetPendingShipmentCountAsync()
+        {
+            return await _context.ImportInventories
+                .Where(i => !i.Export_status)
+                .Select(i => i.Shipping_ref) // Select only shipping_ref
+                .Distinct() // Get distinct values
+                .CountAsync(); // Count them
         }
     }
 }

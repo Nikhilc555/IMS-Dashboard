@@ -1,3 +1,5 @@
+using IMS_Dashboard.Models.Entities;
+using IMS_Dashboard.Repositories.interfaces;
 using IMS_Dashboard.Services.CustomerServices.Interface;
 using IMS_Dashboard.Services.InventoryServices.Interface;
 using IMS_Dashboard.Services.OrderServices.Interface;
@@ -24,11 +26,12 @@ namespace IMS_Dashboard.Controllers
         private readonly IInventoryService _inventoryService;
         private readonly IOrderService _orderService;
         private readonly IuserService _userService;
+        private readonly IreportRepository _reportRepo;
 
         private readonly ILogger<HomeController> _logger;
         public HomeController(ILogger<HomeController> logger, ICustomerService customerService, 
             IProductService productService, ISupplierService supplierService, IInventoryService inventoryService,
-            IOrderService orderService, IuserService userService)
+            IOrderService orderService, IuserService userService, IreportRepository reportRepo)
         {
             _customerService = customerService;
             _productService = productService;
@@ -36,6 +39,7 @@ namespace IMS_Dashboard.Controllers
             _inventoryService = inventoryService;
             _orderService = orderService;
             _userService = userService;
+            _reportRepo = reportRepo;
 
             _logger = logger;
         }
@@ -50,6 +54,8 @@ namespace IMS_Dashboard.Controllers
                 var userCount = await _userService.GetAllUserCountAsync();
                 var shippedCount = await _inventoryService.GetShippedInventoryCountAsync();
                 var pendingCount = await _inventoryService.GetPendingInventoryCountAsync();
+                var shipmentCount = await _inventoryService.GetShipmentCountAsync();
+                var pendingshipmentCount = await _inventoryService.GetPendingShipmentCountAsync();
                 //var inventoryCount = await _inventoryService.GetAllInventoryCount();
                 //var orderCount = await _orderService.GetAllOrdersCount();
                 //var pendingOrderCount = await _orderService.GetOrdersCountByOrderStatus("Pending");
@@ -62,6 +68,9 @@ namespace IMS_Dashboard.Controllers
 
                 //var recentInventories = await _inventoryService.GetRecentInventories();
 
+                var lastWeekInventory = await _reportRepo.GetDailyInventories();
+                var previousWeekInventory = await _reportRepo.GetPreviousnventories();
+
                 // Create ViewModel
                 var dashboardViewModel = new DashboardViewModel
                 {
@@ -73,15 +82,17 @@ namespace IMS_Dashboard.Controllers
                     PendingCount = pendingCount,
                     InventoryCount = 0,
                     OrderCount = 0,
-                    PendingOrderCount = 0,
-                    CompletedOrderCount = 0,
+                    PendingOrderCount = pendingshipmentCount,
+                    CompletedOrderCount = shipmentCount,
                     DeliveredOrderCount = 0,
-                    TotalOrderCount = 0 + 0 + 0,
+                    TotalOrderCount = shipmentCount + pendingshipmentCount,
 
                     top5Customers = null,
                     top5Suppliers = null,
                     recentOrders = null,
                     recentInventory = null,
+                    dailyInventory = lastWeekInventory,
+                    previousInventory = previousWeekInventory
                 };
 
                 // Pass the ViewModel to the View
@@ -103,7 +114,8 @@ namespace IMS_Dashboard.Controllers
                     top5Customers = Enumerable.Empty<DisplayCustomerViewModel>(),
                     top5Suppliers = Enumerable.Empty<DisplaySupplierViewModel>(),
                     recentOrders = Enumerable.Empty<DisplayRecentOrdersViewModel>(),
-                    recentInventory = Enumerable.Empty<DisplayRecentInventoryViewModel>()
+                    recentInventory = Enumerable.Empty<DisplayRecentInventoryViewModel>(),
+                    dailyInventory = Enumerable.Empty<DailyQtyReport>()
                 };
 
                 return View(dashboard);

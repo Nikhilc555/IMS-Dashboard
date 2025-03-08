@@ -15,5 +15,7 @@ namespace IMS_Dashboard.Repositories.interfaces
         Task<bool> UpdateForShipment(List<int> remainingIds, string shippingRef);
         Task<int> GetShippedInventoryCount();
         Task<int> GetPendingInventoryCount();
+        Task<int> GetShipmentCountAsync();
+        Task<int> GetPendingShipmentCountAsync();
     }
 }

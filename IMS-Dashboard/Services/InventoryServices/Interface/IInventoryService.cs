@@ -20,5 +20,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<bool> DeleteInventory(int id);
         Task<int> GetShippedInventoryCountAsync();
         Task<int> GetPendingInventoryCountAsync();
+        Task<int> GetShipmentCountAsync();
+        Task<int> GetPendingShipmentCountAsync();
     }
 }
