@@ -12,8 +12,8 @@
             Add class <code>.table-bordered</code>
             </p> *@
             <div class="col-md-12 row">
-                <div class="col-md-8"></div>
-                <div class="col-md-4">
+                <div class="col-md-4"></div>
+                <div class="col-md-8">
                     <button type="button" id="downloadExcel" style="float:right;" class="btn btn-black">Download Excel</button>
                     <button type="button" class="btn btn-red" style="float:right;" onclick="window.location.href='@Url.Action("GetInventoryForShipping", "Shipment")'">
                         Ship Inventory
@@ -32,6 +32,7 @@
                             <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
+                            <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
                             <th> @Html.DisplayNameFor(model => model.Created_by) </th>
                             <th class="tdcontrol"></th>
@@ -53,6 +54,7 @@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
+                                    <td> @inventory.ShippingRef </td>
                                     <td> @inventory.CreatedOn </td>
                                     <td> @inventory.Created_by </td>
                                     <td class="tdcontrol">

@@ -34,8 +34,19 @@ namespace IMS_Dashboard.Controllers
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                var inventory = await _inventoryService.GetAllInventorywithdate(from_date, to_date);
-                return View(inventory);
+                if(from_date == null || to_date == null)
+                {
+
+                    var inventory = await _inventoryService.GetAllInventory();
+                    return View(inventory);
+                }
+                else
+                {
+
+                    var inventory = await _inventoryService.GetAllInventorywithdate(from_date, to_date);
+                    return View(inventory);
+                }
+
             }
             catch (HttpRequestException ex)
             {
@@ -80,6 +91,7 @@ namespace IMS_Dashboard.Controllers
             addInventoryViewModel.SupplierId = inventory.SupplierId ?? 0;
             addInventoryViewModel.QuantityAdded = inventory.Quantity ?? 0;
             addInventoryViewModel.Weight = inventory.Weight ?? 0;
+            addInventoryViewModel.ShippingRef = inventory.ShippingRef;
             // Fetch dropdowns from the API
             await PopulateDropDownsNew(addInventoryViewModel);
             return View(addInventoryViewModel);
@@ -145,17 +157,23 @@ namespace IMS_Dashboard.Controllers
             try
             {
                 _logger.LogInformation("Attempting to create a new inventory.");
-                bool result = await _inventoryService.AddInventory(inventoryViewModel);
+                string result = await _inventoryService.AddInventory(inventoryViewModel);
 
-                if (result)
+                if (result.ToString() == "Inventory added successfully")
                 {
-                    _logger.LogInformation("Inventory creation successful. Redirecting to GetAllInventories.");
+                    _logger.LogInformation("Inventory added successfully");
+
+                    TempData["Message"] = result.ToString();
+                    TempData["MessageType"] = "success";
+
                     return RedirectToAction(nameof(GetAllInventories));
                 }
                 else
                 {
                     _logger.LogWarning("Inventory creation failed.");
-                    ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                    ModelState.AddModelError("", result.ToString());
+
+
                     await PopulateDropDownsNew(inventoryViewModel);
                     return View(inventoryViewModel);
                 }
@@ -187,17 +205,25 @@ namespace IMS_Dashboard.Controllers
             try
             {
                 _logger.LogInformation("Attempting to create a new inventory.");
-                bool result = await _inventoryService.EditInventory(inventoryViewModel);
+                string result = await _inventoryService.EditInventory(inventoryViewModel);
 
-                if (result)
+
+                if (result.ToString() == "Inventory updated successfully")
                 {
+                    TempData["Message"] = result.ToString();
+                    TempData["MessageType"] = "success";
+
+
                     _logger.LogInformation("Inventory creation successful. Redirecting to GetAllInventories.");
                     return RedirectToAction(nameof(GetAllInventories));
                 }
                 else
                 {
+                    TempData["Message"] = result.ToString();
+                    TempData["MessageType"] = "danger";
+
                     _logger.LogWarning("Inventory creation failed.");
-                    ModelState.AddModelError("", "An error occurred while creating the inventory.");
+                    ModelState.AddModelError("", result.ToString());
                     await PopulateDropDownsNew(inventoryViewModel);
                     return View(inventoryViewModel);
                 }
@@ -278,6 +304,34 @@ namespace IMS_Dashboard.Controllers
                 Value = p.id.ToString(),
                 Text = p.supplier_name
             }).ToList();
+
+            var shippingRef = GetWeeksForNext6Months();
+            inventoryViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            {
+                Value = p.ToString(),
+                Text = p.ToString()
+            }).ToList();
+        }
+
+        public IEnumerable<string> GetWeeksForNext6Months()
+        {
+            List<string> weeksList = new List<string>();
+
+            DateTime today = DateTime.Now;
+            DateTime startMonth = new DateTime(today.Year, today.Month, 1);
+
+            for (int i = 0; i < 6; i++)
+            {
+                DateTime currentMonth = startMonth.AddMonths(i);
+                string monthName = currentMonth.ToString("MMMM");
+
+                for (int week = 1; week <= 4; week++)
+                {
+                    weeksList.Add($"{monthName} - Week {week}");
+                }
+            }
+
+            return weeksList;
         }
     }
 }

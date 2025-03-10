@@ -66,5 +66,58 @@ namespace IMS_Dashboard.Repositories.repos
 
 
         }
+        public async Task<List<DailyQtyReport>> GetMonthlyReport(int year)
+        {
+            var months = Enumerable.Range(1, 12) // Generate months from 1 to 12
+                .Select(month => new DateTime(year, month, 1)) // Create first day of each month
+                .ToList();
+
+            var reportData = await _context.ImportInventories
+                .Where(i => i.CreatedOn.HasValue
+                            && i.CreatedOn.Value.Year == year
+                            && i.IsActive == "Y")
+                .GroupBy(i => new { i.CreatedOn.Value.Year, i.CreatedOn.Value.Month }) // Group by Year and Month
+                .Select(g => new DailyQtyReport
+                {
+                    ReportDate = new DateTime(g.Key.Year, g.Key.Month, 1),
+                    TotalQuantity = g.Sum(i => i.Qty ?? 0)
+                })
+                .ToListAsync();
+
+            var finalReport = months
+                .Select(date => reportData.FirstOrDefault(r => r.ReportDate.Month == date.Month)
+                    ?? new DailyQtyReport { ReportDate = date, TotalQuantity = 0 }) // Default for missing months
+                .OrderBy(r => r.ReportDate)
+                .ToList();
+
+            return finalReport;
+        }
+        public async Task<List<DailyQtyReport>> GetMonthlyShippedReport(int year)
+        {
+            var months = Enumerable.Range(1, 12) // Generate months from 1 to 12
+                .Select(month => new DateTime(year, month, 1)) // Create first day of each month
+                .ToList();
+
+            var reportData = await _context.ImportInventories
+                .Where(i => i.CreatedOn.HasValue
+                            && i.CreatedOn.Value.Year == year
+                            && i.IsActive == "Y" && i.Export_status)
+                .GroupBy(i => new { i.CreatedOn.Value.Year, i.CreatedOn.Value.Month }) // Group by Year and Month
+                .Select(g => new DailyQtyReport
+                {
+                    ReportDate = new DateTime(g.Key.Year, g.Key.Month, 1),
+                    TotalQuantity = g.Sum(i => i.Qty ?? 0)
+                })
+                .ToListAsync();
+
+            var finalReport = months
+                .Select(date => reportData.FirstOrDefault(r => r.ReportDate.Month == date.Month)
+                    ?? new DailyQtyReport { ReportDate = date, TotalQuantity = 0 }) // Default for missing months
+                .OrderBy(r => r.ReportDate)
+                .ToList();
+
+            return finalReport;
+        }
+
     }
 }

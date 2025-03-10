@@ -51,6 +51,7 @@ namespace IMS_Dashboard.Repositories.repos
                     existingInv.Weight = inv.Weight;
                     existingInv.Updated_by = Convert.ToInt32(userId);
                     existingInv.Updated_on = DateTime.UtcNow; // Optional timestamp update
+                    existingInv.Shipping_ref = inv.Shipping_ref;
 
                     _context.ImportInventories.Update(existingInv);
                     await _context.SaveChangesAsync();
@@ -97,9 +98,21 @@ namespace IMS_Dashboard.Repositories.repos
             return inventory;
         }
 
+        public async Task<ImportInventory> GetByCTNNo(int ctn, string shippingRef)
+        {
+
+            var inventory = _context.ImportInventories.FirstOrDefault(c => c.CtnNo == ctn && c.Shipping_ref == shippingRef);
+            return inventory;
+        }
+
         public async Task<IEnumerable<ImportInventory>> GetAllPending()
         {
             var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y").ToList();
+            return inventory;
+        }
+        public async Task<IEnumerable<ImportInventory>> GetAllPendingWithShipRef(string Shippingref)
+        {
+            var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y" && c.Shipping_ref == Shippingref).ToList();
             return inventory;
         }
 
@@ -160,7 +173,7 @@ namespace IMS_Dashboard.Repositories.repos
                         if (remainingIds.Contains(inventory.Id))
                         {
                             inventory.Export_status = true; // Mark as shipped
-                            inventory.Shipping_ref = shippingRef;
+                            //inventory.Shipping_ref = shippingRef;
                             inventory.Shipped_on = DateTime.Now;
                             inventory.Shipped_by = Convert.ToInt32(userId);
                             _context.ImportInventories.Update(inventory);

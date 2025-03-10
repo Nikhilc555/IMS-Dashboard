@@ -76,7 +76,10 @@
                 let table = document.querySelector(".download-table"); // Select the table
                 let tableId = table.id || "Inventory";
                 let wb = XLSX.utils.book_new(); // Create a new Excel file
-                let ws = XLSX.utils.table_to_sheet(table); // Convert the table to a sheet
+                let clonedTable = table.cloneNode(true);
+                clonedTable.querySelectorAll("th.shipped, td.shipped").forEach(cell => cell.remove());
+
+                let ws = XLSX.utils.table_to_sheet(clonedTable); // Convert the table to a sheet
                 XLSX.utils.book_append_sheet(wb, ws, tableId); // Add sheet to workbook
 
                 // Save the Excel file
@@ -221,7 +224,7 @@
             let date = new Date(d.reportDate);
             return date.toLocaleDateString('en-US', { weekday: 'short' }); // "Sunday", "Monday", etc.
         });
-        var dataValues2 = dailyQtyReport.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
+        var dataValues2 = previousQtyReport.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
 
         // Create gradient backgrounds
         var saleGradientBg = graphGradient.createLinearGradient(5, 0, 5, 100);
@@ -262,8 +265,8 @@
                     borderWidth: 1.5,
                     fill: true, // 3: no fill
                     pointBorderWidth: 1,
-                    pointRadius: [0, 0, 0, 4, 0],
-                    pointHoverRadius: [0, 0, 0, 2, 0],
+                    pointRadius: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+                    pointHoverRadius: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
                     pointBackgroundColor: ['#52CDFF)', '#52CDFF', '#52CDFF', '#52CDFF', '#52CDFF)', '#52CDFF', '#52CDFF', '#52CDFF', '#52CDFF)', '#52CDFF', '#52CDFF', '#52CDFF', '#52CDFF)'],
                     pointBorderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff',],
                 }]
@@ -371,7 +374,233 @@
               }]
             });
 
-    }
+        }
+
+        if ($("#marketingOverview").length) {
+            const marketingOverviewCanvas = document.getElementById('marketingOverview');
+
+            // Parse data from ViewModel
+            var labels2 = monthlyInventoryReport.map(d => {
+                let date = new Date(d.reportDate);
+                return date.toLocaleDateString('en-US', { month: 'short' }); // "Sunday", "Monday", etc.
+            });
+            var dataValues2 = monthlyInventoryReport.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
+            // Parse data from ViewModel
+            var labels1 = monthlyshippedInventoryReport.map(d => {
+                let date = new Date(d.reportDate);
+                return date.toLocaleDateString('en-US', { month: 'short' }); // "Sunday", "Monday", etc.
+            });
+            var dataValues1 = monthlyshippedInventoryReport.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
+
+
+            new Chart(marketingOverviewCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels1,
+                    datasets: [{
+                        label: 'Shipped',
+                        data: dataValues1,
+                        backgroundColor: "#52CDFF",
+                        borderColor: [
+                            '#52CDFF',
+                        ],
+                        borderWidth: 0,
+                        barPercentage: 0.35,
+                        fill: true, // 3: no fill
+
+                    }, {
+                        label: 'Added',
+                        data: dataValues2,
+                        backgroundColor: "#1F3BB3",
+                        borderColor: [
+                            '#1F3BB3',
+                        ],
+                        borderWidth: 0,
+                        barPercentage: 0.35,
+                        fill: true, // 3: no fill
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            tension: 0.4,
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                display: true,
+                                drawTicks: false,
+                                color: "#F0F0F0",
+                                zeroLineColor: '#F0F0F0',
+                            },
+                            ticks: {
+                                beginAtZero: false,
+                                autoSkip: true,
+                                maxTicksLimit: 4,
+                                color: "#6B778C",
+                                font: {
+                                    size: 10,
+                                }
+                            }
+                        },
+                        x: {
+                            border: {
+                                display: false
+                            },
+                            stacked: true,
+                            grid: {
+                                display: false,
+                                drawTicks: false,
+                            },
+                            ticks: {
+                                beginAtZero: false,
+                                autoSkip: true,
+                                maxTicksLimit: 7,
+                                color: "#6B778C",
+                                font: {
+                                    size: 10,
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetUpdate: function (chart, args, options) {
+                        const chartId = chart.canvas.id;
+                        var i;
+                        const legendId = `${chartId}-legend`;
+                        const ul = document.createElement('ul');
+                        for (i = 0; i < chart.data.datasets.length; i++) {
+                            ul.innerHTML += `
+                  <li>
+                    <span style="background-color: ${chart.data.datasets[i].borderColor}"></span>
+                    ${chart.data.datasets[i].label}
+                  </li>
+                `;
+                        }
+                        return document.getElementById(legendId).appendChild(ul);
+                    }
+                }]
+            });
+        }
+
+        if ($("#yearDropdown").length) {
+            $("#yearDropdown").change(function () {
+                var labels1;
+                var dataValues1;
+                var labels2;
+                var dataValues2;
+                var selectedYear = $(this).val();
+
+                $.ajax({
+                    url: "/Home/GetDataByYear",
+                    type: "GET",
+                    data: { year: selectedYear },
+                    success: function (data) {
+                        // Parse data from ViewModel
+                        labels2 = data.map(d => {
+                            let date = new Date(d.reportDate);
+                            return date.toLocaleDateString('en-US', { month: 'short' }); // "Sunday", "Monday", etc.
+                        });
+                        dataValues2 = data.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
+
+                        $.ajax({
+                            url: "/Home/GetShippedDataByYear",
+                            type: "GET",
+                            data: { year: selectedYear },
+                            success: function (data1) {
+                                // Parse data from ViewModel
+                                labels1 = data1.map(d => {
+                                    let date = new Date(d.reportDate);
+                                    return date.toLocaleDateString('en-US', { month: 'short' }); // "Sunday", "Monday", etc.
+                                });
+                                dataValues1 = data1.map(d => d.totalQuantity); // [50, 60, 200, 130, 90, 240, 200]
+
+
+                                barchartfn(labels1, dataValues1, labels2, dataValues2);
+
+                            },
+                            error: function () {
+                                alert("Error fetching report data.");
+                            }
+                        });
+                    },
+                    error: function () {
+                        alert("Error fetching report data.");
+                    }
+                });
+
+            });
+        }
+
+        if ($("#doughnutChart").length) {
+            const doughnutChartCanvas = document.getElementById('doughnutChart');
+            new Chart(doughnutChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Total', 'Net', 'Gross', 'AVG'],
+                    datasets: [{
+                        data: [40, 20, 30, 10],
+                        backgroundColor: [
+                            "#1F3BB3",
+                            "#FDD0C7",
+                            "#52CDFF",
+                            "#81DADA"
+                        ],
+                        borderColor: [
+                            "#1F3BB3",
+                            "#FDD0C7",
+                            "#52CDFF",
+                            "#81DADA"
+                        ],
+                    }]
+                },
+                options: {
+                    cutout: 90,
+                    animationEasing: "easeOutBounce",
+                    animateRotate: true,
+                    animateScale: false,
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    showScale: true,
+                    legend: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetUpdate: function (chart, args, options) {
+                        const chartId = chart.canvas.id;
+                        var i;
+                        const legendId = `${chartId}-legend`;
+                        const ul = document.createElement('ul');
+                        for (i = 0; i < chart.data.datasets[0].data.length; i++) {
+                            ul.innerHTML += `
+                  <li>
+                    <span style="background-color: ${chart.data.datasets[0].backgroundColor[i]}"></span>
+                    ${chart.data.labels[i]}
+                  </li>
+                `;
+                        }
+                        return document.getElementById(legendId).appendChild(ul);
+                    }
+                }]
+            });
+        }
 
     if ($("#status-summary").length) { 
       const statusSummaryChartCanvas = document.getElementById('status-summary');
@@ -427,111 +656,6 @@
             }
           }
         }
-      });
-    }
-
-    if ($("#marketingOverview").length) { 
-      const marketingOverviewCanvas = document.getElementById('marketingOverview');
-      new Chart(marketingOverviewCanvas, {
-        type: 'bar',
-        data: {
-          labels: ["JAN","FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
-          datasets: [{
-            label: 'Last week',
-            data: [110, 220, 200, 190, 220, 110, 210, 110, 205, 202, 201, 150],
-            backgroundColor: "#52CDFF",
-            borderColor: [
-                '#52CDFF',
-            ],
-              borderWidth: 0,
-              barPercentage: 0.35,
-              fill: true, // 3: no fill
-              
-          },{
-            label: 'This week',
-            data: [215, 290, 210, 250, 290, 230, 290, 210, 280, 220, 190, 300],
-            backgroundColor: "#1F3BB3",
-            borderColor: [
-                '#1F3BB3',
-            ],
-            borderWidth: 0,
-              barPercentage: 0.35,
-              fill: true, // 3: no fill
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            line: {
-                tension: 0.4,
-            }
-        },
-        
-          scales: {
-            y: {
-              border: {
-                display: false
-              },
-              grid: {
-                display: true,
-                drawTicks: false,
-                color:"#F0F0F0",
-                zeroLineColor: '#F0F0F0',
-              },
-              ticks: {
-                beginAtZero: false,
-                autoSkip: true,
-                maxTicksLimit: 4,
-                color:"#6B778C",
-                font: {
-                  size: 10,
-                }
-              }
-            },
-            x: {
-              border: {
-                display: false
-              },
-              stacked: true,
-              grid: {
-                display: false,
-                drawTicks: false,
-              },
-              ticks: {
-                beginAtZero: false,
-                autoSkip: true,
-                maxTicksLimit: 7,
-                color:"#6B778C",
-                font: {
-                  size: 10,
-                }
-              }
-            }
-          },
-          plugins: {
-            legend: {
-                display: false,
-            }
-          }
-        },
-        plugins: [{
-          afterDatasetUpdate: function (chart, args, options) {
-              const chartId = chart.canvas.id;
-              var i;
-              const legendId = `${chartId}-legend`;
-              const ul = document.createElement('ul');
-              for(i=0;i<chart.data.datasets.length; i++) {
-                  ul.innerHTML += `
-                  <li>
-                    <span style="background-color: ${chart.data.datasets[i].borderColor}"></span>
-                    ${chart.data.datasets[i].label}
-                  </li>
-                `;
-              }
-              return document.getElementById(legendId).appendChild(ul);
-            }
-        }]
       });
     }
 
@@ -611,63 +735,6 @@
   
       bar.text.style.fontSize = '0rem';
       bar.animate(.34); // Number from 0.0 to 1.0
-    }
-
-    if ($("#doughnutChart").length) { 
-      const doughnutChartCanvas = document.getElementById('doughnutChart');
-      new Chart(doughnutChartCanvas, {
-        type: 'doughnut',
-        data: {
-          labels: ['Total','Net','Gross','AVG'],
-          datasets: [{
-            data: [40, 20, 30, 10],
-            backgroundColor: [
-              "#1F3BB3",
-              "#FDD0C7",
-              "#52CDFF",
-              "#81DADA"
-            ],
-            borderColor: [
-              "#1F3BB3",
-              "#FDD0C7",
-              "#52CDFF",
-              "#81DADA"
-            ],
-          }]
-        },
-        options: {
-          cutout: 90,
-          animationEasing: "easeOutBounce",
-          animateRotate: true,
-          animateScale: false,
-          responsive: true,
-          maintainAspectRatio: true,
-          showScale: true,
-          legend: false,
-          plugins: {
-            legend: {
-                display: false,
-            }
-          }
-        },
-        plugins: [{
-          afterDatasetUpdate: function (chart, args, options) {
-              const chartId = chart.canvas.id;
-              var i;
-              const legendId = `${chartId}-legend`;
-              const ul = document.createElement('ul');
-              for(i=0;i<chart.data.datasets[0].data.length; i++) {
-                  ul.innerHTML += `
-                  <li>
-                    <span style="background-color: ${chart.data.datasets[0].backgroundColor[i]}"></span>
-                    ${chart.data.labels[i]}
-                  </li>
-                `;
-              }
-              return document.getElementById(legendId).appendChild(ul);
-            }
-        }]
-      });
     }
 
     if ($("#leaveReport").length) { 
@@ -784,6 +851,124 @@
   });
   // iconify.load('icons.svg').then(function() {
   //   iconify(document.querySelector('.my-cool.icon'));
-  // });
+    // });
+
+    function barchartfn(labels1, dataValues1, labels2, dataValues2) {
+
+        if ($("#marketingOverview").length) {
+
+            var existingChart = Chart.getChart("marketingOverview");
+
+            if (existingChart) {
+                existingChart.destroy(); // Destroy the previous instance
+            }
+
+
+            const marketingOverviewCanvas = document.getElementById('marketingOverview');
+
+
+            new Chart(marketingOverviewCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels1,
+                    datasets: [{
+                        label: 'Shipped',
+                        data: dataValues1,
+                        backgroundColor: "#52CDFF",
+                        borderColor: [
+                            '#52CDFF',
+                        ],
+                        borderWidth: 0,
+                        barPercentage: 0.35,
+                        fill: true, // 3: no fill
+
+                    }, {
+                        label: 'Added',
+                        data: dataValues2,
+                        backgroundColor: "#1F3BB3",
+                        borderColor: [
+                            '#1F3BB3',
+                        ],
+                        borderWidth: 0,
+                        barPercentage: 0.35,
+                        fill: true, // 3: no fill
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            tension: 0.4,
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                display: true,
+                                drawTicks: false,
+                                color: "#F0F0F0",
+                                zeroLineColor: '#F0F0F0',
+                            },
+                            ticks: {
+                                beginAtZero: false,
+                                autoSkip: true,
+                                maxTicksLimit: 4,
+                                color: "#6B778C",
+                                font: {
+                                    size: 10,
+                                }
+                            }
+                        },
+                        x: {
+                            border: {
+                                display: false
+                            },
+                            stacked: true,
+                            grid: {
+                                display: false,
+                                drawTicks: false,
+                            },
+                            ticks: {
+                                beginAtZero: false,
+                                autoSkip: true,
+                                maxTicksLimit: 7,
+                                color: "#6B778C",
+                                font: {
+                                    size: 10,
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDatasetUpdate: function (chart, args, options) {
+                        const chartId = chart.canvas.id;
+                        var i;
+                        const legendId = `${chartId}-legend`;
+                        const ul = document.createElement('ul');
+                        for (i = 0; i < chart.data.datasets.length; i++) {
+                            ul.innerHTML += `
+                  <li>
+                    <span style="background-color: ${chart.data.datasets[i].borderColor}"></span>
+                    ${chart.data.datasets[i].label}
+                  </li>
+                `;
+                        }
+                        return document.getElementById(legendId).appendChild(ul);
+                    }
+                }]
+            });
+        }
+    }
   
 })(jQuery);

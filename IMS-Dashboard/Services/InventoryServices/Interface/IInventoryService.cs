@@ -10,13 +10,14 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventory();
         Task<GetAllInventoryViewModel> GetInventoryById(int id);
         Task<IEnumerable<GetAllInventoryViewModel>> GetPendingInventory();
+        Task<IEnumerable<GetAllInventoryViewModel>> GetPendingWithShipRef(string ShippingRef);
         Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventorywithdate(string from_date, string to_date);
         Task<IEnumerable<ShipmentViewModel>> GetShipmentwithdate(string from_date, string to_date);
         Task<IEnumerable<DisplayRecentInventoryViewModel>> GetRecentInventories();
         Task<bool> CreateInventory(CreateInventoryViewModel inventoryViewModel);
-        Task<bool> AddInventory(AddInventoryViewModel inventoryViewModel);
+        Task<string> AddInventory(AddInventoryViewModel inventoryViewModel);
         Task<bool> UpdateInventoryForShipment(List<int> remainingIds, string shippingRef);
-        Task<bool> EditInventory(AddInventoryViewModel inventoryViewModel);
+        Task<string> EditInventory(AddInventoryViewModel inventoryViewModel);
         Task<bool> DeleteInventory(int id);
         Task<int> GetShippedInventoryCountAsync();
         Task<int> GetPendingInventoryCountAsync();

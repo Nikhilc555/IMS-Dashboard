@@ -130,14 +130,14 @@
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                     <div class="dropdown-header text-center">
                         <img class="img-md rounded-circle" src="~/assets/images/faces/guest-user.webp" style="height:10vh;" alt="Profile image">
-                        <p class="mb-1 mt-3 fw-semibold">Allen Moreno</p>
-                        <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
+                        <p class="mb-1 mt-3 fw-semibold">@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value</p>
+                        <p class="fw-light text-muted mb-0">@User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</p>
                     </div>
                     @* <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
                     <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a>
                     <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
                     <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a> *@
-                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout" method="get"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
                 </div>
             </li>
         </ul>

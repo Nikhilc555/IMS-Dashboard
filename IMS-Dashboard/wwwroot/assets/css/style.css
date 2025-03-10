@@ -30435,10 +30435,20 @@ dl li {
 
 .btn-red {
     background: #D20C18;
+    color: #FFFFFF;
 }
 .btn-black {
     background: #000000;
     color : #FFFFFF;
+}
+.btn-red:hover {
+    background: #000000;
+    color: #FFFFFF;
+}
+
+.btn-black:hover {
+    background: #D20C18;
+    color: #FFFFFF;
 }
 .tdcontrol{
     width:5%;

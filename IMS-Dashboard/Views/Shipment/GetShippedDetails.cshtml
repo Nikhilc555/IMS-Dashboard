@@ -48,7 +48,7 @@
                     <thead>
                         <tr>
                             <th> # </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.ShippingRef) </th>
                             <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
                             @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
                             @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
@@ -56,10 +56,10 @@
                             <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
-                            <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
-                            <th> @Html.DisplayNameFor(model => model.Created_by) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippedOn) </th>
-                            <th> @Html.DisplayNameFor(model => model.Shipped_by) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.CreatedOn) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Created_by) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.ShippedOn) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Shipped_by) </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -70,7 +70,7 @@
                             {
                                 <tr>
                                     <td> @rowNumber </td>
-                                    <td> @inventory.ShippingRef </td>
+                                    <td class="shipped"> @inventory.ShippingRef </td>
                                     <td> @inventory.CTNNo </td>
                                     @* <td> @inventory.ShippingMark </td> *@
                                     @* <td> @inventory.Product </td> *@
@@ -78,10 +78,10 @@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
-                                    <td> @inventory.CreatedOn </td>
-                                    <td> @inventory.Created_by </td>
-                                    <td> @inventory.ShippedOn </td>
-                                    <td> @inventory.Shipped_by </td>
+                                    <td class="shipped"> @inventory.CreatedOn </td>
+                                    <td class="shipped"> @inventory.Created_by </td>
+                                    <td class="shipped"> @inventory.ShippedOn </td>
+                                    <td class="shipped"> @inventory.Shipped_by </td>
                                 </tr>
                                 rowNumber++;
                             }

@@ -4,6 +4,7 @@ using IMS_Dashboard.Services.SupplierServices.Interface;
 using IMS_Dashboard.Services.TransactionTypeServices.Interface;
 using IMS_Dashboard.Services.TransactionTypeServices.Service;
 using IMS_Dashboard.ViewModels.InventoryVM;
+using IMS_Dashboard.ViewModels.ShipmentVM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -48,14 +49,23 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetInventoryForShipping()
+        public async Task<IActionResult> GetInventoryForShipping(string shippingRef = null)
         {
             try
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                var inventory = await _inventoryService.GetPendingInventory();
-                return View(inventory);
+                var model = new GetAllShipmentViewModel();
+
+                model.ShippingRef = shippingRef;
+                PopulateDropDownsNew(model);
+
+                if (!string.IsNullOrEmpty(shippingRef))
+                {
+                    model.Inventory = await _inventoryService.GetPendingWithShipRef(shippingRef);
+
+                }
+                return View(model);
             }
             catch (HttpRequestException ex)
             {
@@ -84,7 +94,7 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateInventory(string updatedInventoryForShipment, string shippingRef)
+        public async Task<IActionResult> UpdateExportStatus(string updatedInventoryForShipment, string shippingRef)
         {
             if (!string.IsNullOrEmpty(updatedInventoryForShipment))
             {
@@ -130,6 +140,36 @@ namespace IMS_Dashboard.Controllers
             }
 
             return RedirectToAction(nameof(GetInventoryForShipping));
+        }
+        private async Task PopulateDropDownsNew(GetAllShipmentViewModel shipmentViewModel)
+        {
+
+            var shippingRef = GetWeeksForNext6Months();
+            shipmentViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            {
+                Value = p.ToString(),
+                Text = p.ToString()
+            }).ToList();
+        }
+        public IEnumerable<string> GetWeeksForNext6Months()
+        {
+            List<string> weeksList = new List<string>();
+
+            DateTime today = DateTime.Now;
+            DateTime startMonth = new DateTime(today.Year, today.Month, 1);
+
+            for (int i = 0; i < 6; i++)
+            {
+                DateTime currentMonth = startMonth.AddMonths(i);
+                string monthName = currentMonth.ToString("MMMM");
+
+                for (int week = 1; week <= 4; week++)
+                {
+                    weeksList.Add($"{monthName} - Week {week}");
+                }
+            }
+
+            return weeksList;
         }
 
 

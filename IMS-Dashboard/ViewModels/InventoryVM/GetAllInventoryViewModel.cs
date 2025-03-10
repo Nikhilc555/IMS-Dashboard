@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace IMS_Dashboard.ViewModels.InventoryVM
 {
@@ -31,5 +32,9 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         public string Export_Status { get; set; }
         public string from_date { get; set; }
         public string to_date { get; set; }
+
+        [Display(Name = "Shipping Ref.")]
+        public string ShippingRef { get; set; }
+        public List<SelectListItem>? ShippingRefOptions { get; set; }
     }
 }

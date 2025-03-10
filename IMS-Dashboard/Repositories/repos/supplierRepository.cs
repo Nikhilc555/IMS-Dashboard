@@ -24,7 +24,7 @@ namespace IMS_Dashboard.Repositories.repos
 
         public async Task<IEnumerable<Suppliers>> GetAll()
         {
-            var supplier = _context.Suppliers.ToList();
+            var supplier = _context.Suppliers.Where(s => s.IsActive == true).ToList();
             return supplier;
         }
 

@@ -2,8 +2,8 @@
 
 @{
     ViewData["Title"] = "Inventory List";
-    var from_date = Model?.FirstOrDefault()?.from_date ?? DateTime.Today.ToString("yyyy-MM-dd");
-    var to_date = Model?.FirstOrDefault()?.to_date ?? DateTime.Today.ToString("yyyy-MM-dd");
+    var from_date = Model?.FirstOrDefault()?.from_date ?? "";
+    var to_date = Model?.FirstOrDefault()?.to_date ?? "";
 }
 
 <div class="col-lg-12 grid-margin stretch-card">
@@ -55,6 +55,7 @@
                             <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
+                            <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
                             <th> @Html.DisplayNameFor(model => model.Created_by) </th>
                         </tr>
@@ -74,6 +75,7 @@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
+                                    <td> @inventory.ShippingRef </td>
                                     <td> @inventory.CreatedOn </td>
                                     <td> @inventory.Created_by </td>
                                 </tr>

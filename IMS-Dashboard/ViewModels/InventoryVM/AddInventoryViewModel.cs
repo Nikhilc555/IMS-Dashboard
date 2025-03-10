@@ -21,7 +21,9 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Required(ErrorMessage = "Weight is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Weight must be greater than 0.")]
         public decimal Weight { get; set; }
+        public string ShippingRef { get; set; }
         public List<SelectListItem>? Products { get; set; }
         public List<SelectListItem>? Suppliers { get; set; }
+        public List<SelectListItem>? ShippingRefOptions { get; set; }
     }
 }

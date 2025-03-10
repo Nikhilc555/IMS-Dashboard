@@ -15,7 +15,7 @@ namespace IMS_Dashboard.ViewModels.ShipmentVM
         public int? ProductId { get; set; }
         public int? SupplierId { get; set; }
 
-        [Display(Name = "Supplier Name")]
+        [Display(Name = "Shipment Mark")]
         public string Supplier { get; set; }
 
         [Display(Name = "Product Name")]

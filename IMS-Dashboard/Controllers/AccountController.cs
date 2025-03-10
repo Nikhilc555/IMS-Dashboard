@@ -63,6 +63,7 @@ namespace IMS_Dashboard.Controllers
                         var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.GivenName, user.NameOfUser),
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                         new Claim(ClaimTypes.Role, role.Role1)
                     };
@@ -82,11 +83,11 @@ namespace IMS_Dashboard.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult Logout()
         {
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            return RedirectToAction("Login","Account");
         }
     }
 }

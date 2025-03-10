@@ -47,10 +47,10 @@
             </a>
             <div class="collapse" id="supplier">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllSuppliers", "Suppliers")">Display Supplier</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllSuppliers", "Suppliers")">Shipment Mark List</a></li>
                     @if (User.IsInRole("Admin") || User.IsInRole("Super Admin"))
                     {
-                        <li class="nav-item"> <a class="nav-link" href="@Url.Action("AddSupplier", "Suppliers")">Add Supplier</a></li>
+                        <li class="nav-item"> <a class="nav-link" href="@Url.Action("AddSupplier", "Suppliers")">Add Shipment Mark</a></li>
                     }
                 </ul>
             </div>
@@ -60,13 +60,13 @@
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#inventory" aria-expanded="false" aria-controls="inventory">
                 <i class="menu-icon mdi mdi-warehouse"></i>
-                <span class="menu-title">Inventory</span>
+                <span class="menu-title">Stocks</span>
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="inventory">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllInventories", "Inventories")">Display Inventory</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("AddInventory", "Inventories")">Add Inventory</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllInventories", "Inventories")">Stock List</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("AddInventory", "Inventories")">Add Stock</a></li>
                 </ul>
             </div>
         </li>
@@ -81,9 +81,9 @@
             <div class="collapse" id="shipment">
                 <ul class="nav flex-column sub-menu">
                     @* <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllOrders", "Orders")">Display Orders</a></li> *@
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllPendingInventory", "Shipment")">Pending Inventory</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetInventoryForShipping", "Shipment")">Inventory Shipping</a></li>
-                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetShippedDetails", "Shipment")">Shipped Details</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetAllPendingInventory", "Shipment")">Pending Stock</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetInventoryForShipping", "Shipment")">Ship Stock</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="@Url.Action("GetShippedDetails", "Shipment")">Completed Stock</a></li>
                 </ul>
             </div>
         </li>

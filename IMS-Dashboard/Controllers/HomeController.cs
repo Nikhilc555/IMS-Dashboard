@@ -70,10 +70,13 @@ namespace IMS_Dashboard.Controllers
 
                 var lastWeekInventory = await _reportRepo.GetDailyInventories();
                 var previousWeekInventory = await _reportRepo.GetPreviousnventories();
+                var MonthlyInventory = await _reportRepo.GetMonthlyReport(DateTime.Now.Year);
+                var MonthlyshippedInventory = await _reportRepo.GetMonthlyShippedReport(DateTime.Now.Year);
 
                 // Create ViewModel
                 var dashboardViewModel = new DashboardViewModel
                 {
+                    SelectedYear = DateTime.Now.Year,
                     CustomerCount = 0,
                     ProductCount = 0,
                     SupplierCount = supplierCount,
@@ -92,7 +95,10 @@ namespace IMS_Dashboard.Controllers
                     recentOrders = null,
                     recentInventory = null,
                     dailyInventory = lastWeekInventory,
-                    previousInventory = previousWeekInventory
+                    previousInventory = previousWeekInventory,
+                    monthlyInventory = MonthlyInventory,
+                    monthlyShippedInventory = MonthlyshippedInventory,
+                    TotalInventoryCount = MonthlyInventory.Sum(i => i.TotalQuantity)
                 };
 
                 // Pass the ViewModel to the View
@@ -115,11 +121,28 @@ namespace IMS_Dashboard.Controllers
                     top5Suppliers = Enumerable.Empty<DisplaySupplierViewModel>(),
                     recentOrders = Enumerable.Empty<DisplayRecentOrdersViewModel>(),
                     recentInventory = Enumerable.Empty<DisplayRecentInventoryViewModel>(),
-                    dailyInventory = Enumerable.Empty<DailyQtyReport>()
+                    dailyInventory = Enumerable.Empty<DailyQtyReport>(),
+                    previousInventory = Enumerable.Empty<DailyQtyReport>(),
+                    monthlyInventory = Enumerable.Empty<DailyQtyReport>(),
+                    monthlyShippedInventory = Enumerable.Empty<DailyQtyReport>()
                 };
 
                 return View(dashboard);
             }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetDataByYear(int year)
+        {
+            var report = await _reportRepo.GetMonthlyReport(year);
+            return Json(report);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetShippedDataByYear(int year)
+        {
+            var report = await _reportRepo.GetMonthlyShippedReport(year);
+            return Json(report);
         }
 
         public IActionResult Privacy()

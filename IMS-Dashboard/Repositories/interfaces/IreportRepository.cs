@@ -6,5 +6,7 @@ namespace IMS_Dashboard.Repositories.interfaces
     {
         Task<IEnumerable<DailyQtyReport>> GetDailyInventories();
         Task<IEnumerable<DailyQtyReport>> GetPreviousnventories();
+        Task<List<DailyQtyReport>> GetMonthlyReport(int year);
+        Task<List<DailyQtyReport>> GetMonthlyShippedReport(int year);
     }
 }

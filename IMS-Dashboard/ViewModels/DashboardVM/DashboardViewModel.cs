@@ -20,6 +20,8 @@ namespace IMS_Dashboard.ViewModels.DashboardVM
         public int CompletedOrderCount { get; set; }
         public int DeliveredOrderCount { get; set; }
         public int TotalOrderCount { get; set; }
+        public int TotalInventoryCount { get; set; }
+        public int SelectedYear { get; set; }
 
         public IEnumerable<DisplayCustomerViewModel>? top5Customers { get; set; }
         public IEnumerable<DisplaySupplierViewModel>? top5Suppliers { get; set; }
@@ -27,5 +29,7 @@ namespace IMS_Dashboard.ViewModels.DashboardVM
         public IEnumerable<DisplayRecentInventoryViewModel>? recentInventory { get; set; }
         public IEnumerable<DailyQtyReport>? dailyInventory { get; set; }
         public IEnumerable<DailyQtyReport>? previousInventory { get; set; }
+        public IEnumerable<DailyQtyReport>? monthlyInventory { get; set; }
+        public IEnumerable<DailyQtyReport>? monthlyShippedInventory { get; set; }
     }
 }

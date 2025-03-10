@@ -113,10 +113,11 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
-                            Supplier = supplier?.SupplierName,
+                            Supplier = supplier?.ShipmentMarks,
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
-                            Export_Status = inventory.Export_status ? "Pending" : "Completed"
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            ShippingRef = inventory.Shipping_ref
                         });
 
                     }
@@ -168,10 +169,66 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
-                            Supplier = supplier?.SupplierName,
+                            Supplier = supplier?.ShipmentMarks,
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
-                            Export_Status = inventory.Export_status ? "Pending" : "Completed"
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            ShippingRef = inventory.Shipping_ref
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+        public async Task<IEnumerable<GetAllInventoryViewModel>> GetPendingWithShipRef(string ShippingRef)
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<GetAllInventoryViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+
+                var inventories = await _inventoryRepo.GetAllPendingWithShipRef(ShippingRef);
+
+                IEnumerable<GetAllInventoryViewModel> inventoryList = new List<GetAllInventoryViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories)
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        tempList.Add(new GetAllInventoryViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.ShipmentMarks,
+                            CreatedOn = DateTime.Now,
+                            Created_by = user?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            ShippingRef = inventory.Shipping_ref
                         });
 
                     }
@@ -223,10 +280,11 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
-                            Supplier = supplier?.SupplierName,
+                            Supplier = supplier?.ShipmentMarks,
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            ShippingRef = inventory.Shipping_ref,
                             from_date = from_date,
                             to_date = to_date,
                         });
@@ -365,7 +423,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             }
         }
 
-        public async Task<bool> AddInventory(AddInventoryViewModel inventoryViewModel)
+        public async Task<string> AddInventory(AddInventoryViewModel inventoryViewModel)
         {
             if (inventoryViewModel == null)
             {
@@ -378,29 +436,40 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                 //int quantityInStock = inventoryViewModel.QuantityAdded;
                 //quantityInStock = Math.Max(quantityInStock, 0); // Prevent nagative stock
 
-                var inventoryToCreate = new ImportInventory
+                var inv = await _inventoryRepo.GetByCTNNo(inventoryViewModel.CTNNo, inventoryViewModel.ShippingRef);
+                if (inv == null)
                 {
-                    CtnNo = inventoryViewModel.CTNNo,
-                    //ShippingMark = inventoryViewModel.ShippingMark,
-                    Description = inventoryViewModel?.Description,
-                    ProductId = inventoryViewModel.ProductId,
-                    Qty = inventoryViewModel.QuantityAdded,
-                    Weight = inventoryViewModel.Weight,
-                    SupplierId = inventoryViewModel.SupplierId,
-                    CreatedOn = DateTime.UtcNow,
-                    Export_status = false
-                };
 
-                _logger.LogInformation("Sending request to create a new inventory.");
+                    var inventoryToCreate = new ImportInventory
+                    {
+                        CtnNo = inventoryViewModel.CTNNo,
+                        //ShippingMark = inventoryViewModel.ShippingMark,
+                        Description = inventoryViewModel?.Description,
+                        ProductId = inventoryViewModel.ProductId,
+                        Qty = inventoryViewModel.QuantityAdded,
+                        Weight = inventoryViewModel.Weight,
+                        SupplierId = inventoryViewModel.SupplierId,
+                        CreatedOn = DateTime.UtcNow,
+                        Export_status = false,
+                        Shipping_ref = inventoryViewModel.ShippingRef
+                    };
 
-                await _inventoryRepo.Create(inventoryToCreate);
+                    _logger.LogInformation("Sending request to create a new inventory.");
 
-                return true;
+                    await _inventoryRepo.Create(inventoryToCreate);
+
+                    return "Inventory added successfully";
+                }
+                else
+                {
+
+                    return "Inventory with same CTN No already exists";
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating the inventory.");
-                return false;
+                return "Something went wrong";
             }
         }
 
@@ -454,7 +523,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             ProductId = inventories?.ProductId,
                             Quantity = inventories.Qty,
                             Weight = inventories.Weight,
-                            SupplierId = inventories?.SupplierId
+                            SupplierId = inventories?.SupplierId,
+                            ShippingRef = inventories?.Shipping_ref
                         };
 
                 }
@@ -473,7 +543,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             }
         }
 
-        public async Task<bool> EditInventory(AddInventoryViewModel inventoryViewModel)
+        public async Task<string> EditInventory(AddInventoryViewModel inventoryViewModel)
         {
             if (inventoryViewModel == null)
             {
@@ -483,30 +553,40 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             try
             {
 
-                var inventoryToCreate = new ImportInventory
+                var inv = await _inventoryRepo.GetByCTNNo(inventoryViewModel.CTNNo, inventoryViewModel.ShippingRef);
+                if ((inv == null ? 0 : inv.Id) == inventoryViewModel.Id)
                 {
-                    Id = inventoryViewModel.Id,
-                    CtnNo = inventoryViewModel.CTNNo,
-                    //ShippingMark = inventoryViewModel.ShippingMark,
-                    Description = inventoryViewModel?.Description,
-                    ProductId = inventoryViewModel.ProductId,
-                    Qty = inventoryViewModel.QuantityAdded,
-                    Weight = inventoryViewModel.Weight,
-                    SupplierId = inventoryViewModel.SupplierId,
-                    Updated_on = DateTime.UtcNow,
-                    Export_status = false
-                };
+                    var inventoryToCreate = new ImportInventory
+                    {
+                        Id = inventoryViewModel.Id,
+                        CtnNo = inventoryViewModel.CTNNo,
+                        //ShippingMark = inventoryViewModel.ShippingMark,
+                        Description = inventoryViewModel?.Description,
+                        ProductId = inventoryViewModel.ProductId,
+                        Qty = inventoryViewModel.QuantityAdded,
+                        Weight = inventoryViewModel.Weight,
+                        SupplierId = inventoryViewModel.SupplierId,
+                        Updated_on = DateTime.UtcNow,
+                        Export_status = false,
+                        Shipping_ref = inventoryViewModel.ShippingRef
+                    };
 
-                _logger.LogInformation("Sending request to update an inventory.");
+                    _logger.LogInformation("Sending request to update an inventory.");
 
-                await _inventoryRepo.Update(inventoryToCreate);
+                    await _inventoryRepo.Update(inventoryToCreate);
 
-                return true;
+
+                    return "Inventory updated successfully";
+                }
+                else
+                { 
+                    return "Inventory with same CTN No already exists";
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating the inventory.");
-                return false;
+                return "Something went wrong";
             }
         }
 
@@ -565,7 +645,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             Product = product?.ProductName,
                             Quantity = inventory.Qty,
                             Weight = inventory.Weight,
-                            Supplier = supplier?.SupplierName,
+                            Supplier = supplier?.ShipmentMarks,
                             CreatedOn = inventory.CreatedOn,
                             Created_by = user?.NameOfUser,
                             ShippingRef = inventory.Shipping_ref,

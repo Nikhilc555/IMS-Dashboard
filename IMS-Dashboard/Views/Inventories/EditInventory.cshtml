@@ -76,6 +76,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label asp-for="ShippingRef" class="control-label"> Shipment Mark</label>
+                            <div class="col-sm-9">
+                                <select class="form-select" asp-for="ShippingRef" asp-items="@Model.ShippingRefOptions"></select>
+                                <span asp-validation-for="ShippingRef" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <input type="hidden" asp-for="Id"/>
