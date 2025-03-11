@@ -110,6 +110,48 @@ namespace IMS_Dashboard.Repositories.repos
             var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y").ToList();
             return inventory;
         }
+
+        public async Task<IEnumerable<ImportInventory>> GetAllPendingWithDate(string from_date, string to_date)
+        {
+            //var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y").ToList();
+
+            var inventory = _context.ImportInventories.ToList().AsEnumerable();
+
+            if (!string.IsNullOrEmpty(from_date) && !string.IsNullOrEmpty(to_date))
+            {
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
+                {
+                    fromDate = DateTime.Today;
+                }
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
+                {
+                    toDate = DateTime.Today;
+                }
+                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N" && i.Export_status == false);
+            }
+            else 
+            {
+                DateTime fromDate, toDate;
+
+                // Ensure from_date and to_date are properly handled
+                if (!DateTime.TryParse(from_date as string, out fromDate))
+                {
+                    fromDate = DateTime.Today;
+                }
+
+                if (!DateTime.TryParse(to_date as string, out toDate))
+                {
+                    toDate = DateTime.Today;
+                }
+
+                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N" && i.Export_status == false);
+            }
+            return inventory;
+        }
         public async Task<IEnumerable<ImportInventory>> GetAllPendingWithShipRef(string Shippingref)
         {
             var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y" && c.Shipping_ref == Shippingref).ToList();

@@ -22,6 +22,7 @@ public partial class ImsDbContext : DbContext
     public virtual DbSet<ShipmentDetail> ShipmentDetails { get; set; }
 
     public virtual DbSet<SystemUser> SystemUsers { get; set; }
+    public virtual DbSet<ShipmentList> ShipmentList { get; set; }
 
     public virtual DbSet<UnitOfMeasure> UnitOfMeasures { get; set; }
     public virtual DbSet<Suppliers> Suppliers { get; set; }

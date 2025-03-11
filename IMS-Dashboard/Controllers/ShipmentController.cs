@@ -31,14 +31,23 @@ namespace IMS_Dashboard.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPendingInventory()
+        public async Task<IActionResult> GetAllPendingInventory(string? from_date, string? to_date)
         {
             try
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                var inventory = await _inventoryService.GetPendingInventory();
-                return View(inventory);
+                if (from_date == null || to_date == null)
+                {
+
+                    var inventory = await _inventoryService.GetPendingInventory();
+                    return View(inventory);
+                }
+                else
+                {
+                    var inventory = await _inventoryService.GetPendingInventoryWithDate(from_date, to_date);
+                    return View(inventory);
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -93,6 +102,70 @@ namespace IMS_Dashboard.Controllers
             }
         }
 
+
+
+        [HttpGet("AddShipmentList")]
+        public async Task<IActionResult> AddShipmentList()
+        {
+            try
+            {
+                _logger.LogInformation("Add shipment name");
+
+                var model = new AddShipmentNameViewModel();
+
+                return View(model);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log Exception
+                _logger.LogError(ex, "Error in add shipment name.");
+                throw;
+            }
+        }
+
+
+        [HttpPost("AddShipmentList")]
+        public async Task<IActionResult> AddShipmentList(AddShipmentNameViewModel shipmentnameViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(x => x.Errors);
+                foreach (var error in errors)
+                {
+                    _logger.LogError($"Model validation error: {error.ErrorMessage}");
+                }
+
+                return View(shipmentnameViewModel);
+            }
+
+            try
+            {
+                _logger.LogInformation("Attempting to create a new shipment name.");
+                string result = await _inventoryService.AddShipment(shipmentnameViewModel);
+
+                if (result.ToString() == "Shipment Name added successfully")
+                {
+                    _logger.LogInformation("Shipment Name added successfully");
+                    ModelState.Clear();
+                    shipmentnameViewModel = new AddShipmentNameViewModel();
+                    return View(shipmentnameViewModel);
+                }
+                else
+                {
+                    _logger.LogWarning("Shipment Name creation failed.");
+                    ModelState.AddModelError("", result.ToString());
+
+                    return View(shipmentnameViewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the shipment name.");
+                ModelState.AddModelError("", "An error occurred while creating the shipment name.");
+                return View(shipmentnameViewModel);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateExportStatus(string updatedInventoryForShipment, string shippingRef)
         {
@@ -144,11 +217,17 @@ namespace IMS_Dashboard.Controllers
         private async Task PopulateDropDownsNew(GetAllShipmentViewModel shipmentViewModel)
         {
 
-            var shippingRef = GetWeeksForNext6Months();
-            shipmentViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            //var shippingRef = GetWeeksForNext6Months();
+            //shipmentViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            //{
+            //    Value = p.ToString(),
+            //    Text = p.ToString()
+            //}).ToList();
+            var shipmentlist = await _inventoryService.GetAllShipmentNames();
+            shipmentViewModel.ShippingRefOptions = shipmentlist.Select(p => new SelectListItem
             {
-                Value = p.ToString(),
-                Text = p.ToString()
+                Value = p.Id.ToString(),
+                Text = p.ShipmentName
             }).ToList();
         }
         public IEnumerable<string> GetWeeksForNext6Months()

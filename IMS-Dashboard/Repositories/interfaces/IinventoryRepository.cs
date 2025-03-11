@@ -12,6 +12,7 @@ namespace IMS_Dashboard.Repositories.interfaces
         Task<ImportInventory> GetById(int id);
         Task<ImportInventory> GetByCTNNo(int ctn, string shippingRef);
         Task<IEnumerable<ImportInventory>> GetAllPending();
+        Task<IEnumerable<ImportInventory>> GetAllPendingWithDate(string from_date, string to_date);
         Task<IEnumerable<ImportInventory>> GetAllPendingWithShipRef(string Shippingref);
         Task<IEnumerable<ImportInventory>> GetAllWithDate(string from_date, string to_date);
         Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date);

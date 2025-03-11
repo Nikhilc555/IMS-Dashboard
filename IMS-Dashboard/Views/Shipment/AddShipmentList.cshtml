@@ -1,0 +1,27 @@
+﻿@model IMS_Dashboard.ViewModels.ShipmentVM.AddShipmentNameViewModel
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Create Shipment</h4>
+
+            <form asp-action="AddShipmentList" class="forms-sample" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label asp-for="ShipmentName" class="control-label"></label>
+                            <div class="col-sm-9">
+                                <input asp-for="ShipmentName" type="text" class="form-control"
+                                       placeholder="Enter Shipment Name.." id="ShipmentName">
+                                <span asp-validation-for="ShipmentName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-black">Add Shipment</button>
+            </form>
+        </div>
+    </div>
+</div>

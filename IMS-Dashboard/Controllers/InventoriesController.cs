@@ -305,12 +305,21 @@ namespace IMS_Dashboard.Controllers
                 Text = p.supplier_name
             }).ToList();
 
-            var shippingRef = GetWeeksForNext6Months();
-            inventoryViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            var shipmentlist = await _inventoryService.GetAllShipmentNames();
+            inventoryViewModel.ShippingRefOptions = shipmentlist.Select(p => new SelectListItem
             {
-                Value = p.ToString(),
-                Text = p.ToString()
+                Value = p.Id.ToString(),
+                Text = p.ShipmentName
             }).ToList();
+
+
+
+            //var shippingRef = GetWeeksForNext6Months();
+            //inventoryViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            //{
+            //    Value = p.ToString(),
+            //    Text = p.ToString()
+            //}).ToList();
         }
 
         public IEnumerable<string> GetWeeksForNext6Months()

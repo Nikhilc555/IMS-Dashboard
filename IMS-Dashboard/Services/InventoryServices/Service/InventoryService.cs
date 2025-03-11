@@ -17,6 +17,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
     public class InventoryService : IInventoryService
     {
         private readonly IinventoryRepository _inventoryRepo;
+        private readonly IshipmentnameRepository _shipmentnameRepo;
         private readonly IproductRepository _productRepo;
         private readonly IsupplierRepository _supplierRepo;
         private readonly IuserRepository _userRepo;
@@ -26,7 +27,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
         private const string cacheKey = "InventoryList";
         public InventoryService(HttpClient httpClient, ILogger<InventoryService> logger, IMemoryCache cache
             , IinventoryRepository inventoryRepo, IproductRepository productRepo, IsupplierRepository supplierRepo
-            , IuserRepository userRepo)
+            , IuserRepository userRepo, IshipmentnameRepository shipmentnameRepo)
         {
             _httpClient = httpClient;
             _logger = logger;
@@ -35,6 +36,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             _productRepo = productRepo;
             _supplierRepo = supplierRepo;
             _userRepo = userRepo;
+            _shipmentnameRepo = shipmentnameRepo;
         }
 
         public async Task<IEnumerable<DisplayInventoryViewModel>> GetAllInventories()
@@ -104,6 +106,12 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         var product = await _productRepo.Get(inventory.ProductId);
                         var supplier = await _supplierRepo.Get(inventory.SupplierId);
                         var user = await _userRepo.Get(inventory.CreatedBy);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if(ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
                         tempList.Add(new GetAllInventoryViewModel
                         {
                             Id = inventory.Id,
@@ -117,7 +125,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",
-                            ShippingRef = inventory.Shipping_ref
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName
                         });
 
                     }
@@ -160,6 +168,12 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         var product = await _productRepo.Get(inventory.ProductId);
                         var supplier = await _supplierRepo.Get(inventory.SupplierId);
                         var user = await _userRepo.Get(inventory.CreatedBy);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if (ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
                         tempList.Add(new GetAllInventoryViewModel
                         {
                             Id = inventory.Id,
@@ -173,7 +187,72 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",
-                            ShippingRef = inventory.Shipping_ref
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName
+                        });
+
+                    }
+                    inventoryList = tempList;
+                }
+
+                return inventoryList;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
+                throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<GetAllInventoryViewModel>> GetPendingInventoryWithDate(string from_date, string to_date)
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<GetAllInventoryViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached inventory list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+
+                var inventories = await _inventoryRepo.GetAllPendingWithDate(from_date, to_date);
+
+                IEnumerable<GetAllInventoryViewModel> inventoryList = new List<GetAllInventoryViewModel>();
+                if (inventories != null)
+                {
+                    var tempList = inventoryList.ToList();
+                    foreach (var inventory in inventories)
+                    {
+                        var product = await _productRepo.Get(inventory.ProductId);
+                        var supplier = await _supplierRepo.Get(inventory.SupplierId);
+                        var user = await _userRepo.Get(inventory.CreatedBy);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if (ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
+                        tempList.Add(new GetAllInventoryViewModel
+                        {
+                            Id = inventory.Id,
+                            CTNNo = inventory.CtnNo,
+                            //ShippingMark = inventory.ShippingMark,
+                            Description = inventory?.Description,
+                            Product = product?.ProductName,
+                            Quantity = inventory.Qty,
+                            Weight = inventory.Weight,
+                            Supplier = supplier?.ShipmentMarks,
+                            CreatedOn = DateTime.Now,
+                            Created_by = user?.NameOfUser,
+                            Export_Status = inventory.Export_status ? "Pending" : "Completed",
+                            //ShippingRef = inventory.Shipping_ref,
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName,
+                            from_date = from_date,
+                            to_date = to_date,
                         });
 
                     }
@@ -215,6 +294,12 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         var product = await _productRepo.Get(inventory.ProductId);
                         var supplier = await _supplierRepo.Get(inventory.SupplierId);
                         var user = await _userRepo.Get(inventory.CreatedBy);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if (ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
                         tempList.Add(new GetAllInventoryViewModel
                         {
                             Id = inventory.Id,
@@ -228,7 +313,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",
-                            ShippingRef = inventory.Shipping_ref
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName
                         });
 
                     }
@@ -241,6 +326,50 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             {
                 _logger.LogError(httpEx, "Network issue occurred while contacting the Inventory API.");
                 throw new InventoryServiceException("Network error occurred while fetching inventories.", httpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllInventories");
+                throw new InventoryServiceException("An unexpected error occurred while fetching inventories.", ex);
+            }
+        }
+        public async Task<IEnumerable<ShipmentNameViewModel>> GetAllShipmentNames()
+        {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<ShipmentNameViewModel> cachedInventory))
+            {
+                _logger.LogInformation("Returning cached shipment name list.");
+                return cachedInventory;
+            }
+
+            try
+            {
+
+                var shipmennames = await _shipmentnameRepo.GetAll();
+
+                IEnumerable<ShipmentNameViewModel> shipmentlist= new List<ShipmentNameViewModel>();
+                if (shipmennames != null)
+                {
+                    var tempList = shipmentlist.ToList();
+                    foreach (var s in shipmennames)
+                    {
+                        var user = await _userRepo.Get(s.CreatedBy);
+                        var ctncount = await _shipmentnameRepo.GetCountWithShipmentName(s.Id);
+                        tempList.Add(new ShipmentNameViewModel
+                        {
+                            Id = s.Id,
+                            ShipmentName = ctncount.ToString() + " CTN " + s.ShipmentName
+                        });
+
+                    }
+                    shipmentlist = tempList;
+                }
+
+                return shipmentlist;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                _logger.LogError(httpEx, "Network issue occurred while contacting the shipment API.");
+                throw new InventoryServiceException("Network error occurred while fetching shipment names.", httpEx);
             }
             catch (Exception ex)
             {
@@ -271,6 +400,12 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         var product = await _productRepo.Get(inventory.ProductId);
                         var supplier = await _supplierRepo.Get(inventory.SupplierId);
                         var user = await _userRepo.Get(inventory.CreatedBy);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if (ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
                         tempList.Add(new GetAllInventoryViewModel
                         {
                             Id = inventory.Id,
@@ -284,7 +419,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             CreatedOn = DateTime.Now,
                             Created_by = user?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",
-                            ShippingRef = inventory.Shipping_ref,
+                            //ShippingRef = inventory.Shipping_ref,
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName,
                             from_date = from_date,
                             to_date = to_date,
                         });
@@ -473,6 +609,53 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             }
         }
 
+        public async Task<string> AddShipment(AddShipmentNameViewModel shipmentViewModel)
+        {
+            if (shipmentViewModel == null)
+            {
+                throw new ArgumentNullException(nameof(shipmentViewModel));
+            }
+
+            try
+            {
+                //// Calculate QuantityInStock
+                //int quantityInStock = inventoryViewModel.QuantityAdded;
+                //quantityInStock = Math.Max(quantityInStock, 0); // Prevent nagative stock
+
+                var ship = await _shipmentnameRepo.GetByShipmentName(shipmentViewModel.ShipmentName + DateTime.Now.ToString("-dd-MM-yyyy"));
+                var count = 0;
+                if (ship != null)
+                {
+                    count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                }
+                if (ship == null)
+                {
+
+                    var shipmentToCreate = new ShipmentList
+                    {
+                        ShipmentName = shipmentViewModel.ShipmentName + DateTime.Now.ToString("-dd-MM-yyyy"),
+                        CreatedOn =DateTime.Now
+                    };
+
+                    _logger.LogInformation("Sending request to create a new shipment name.");
+
+                    await _shipmentnameRepo.Create(shipmentToCreate);
+
+                    return "Shipment Name added successfully";
+                }
+                else
+                {
+
+                    return "Shipment with same name already exists";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the shipment name.");
+                return "Something went wrong";
+            }
+        }
+
         public async Task<bool> UpdateInventoryForShipment(List<int> remainingIds, string shippingRef)
         {
             if (remainingIds == null)
@@ -554,7 +737,7 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
             {
 
                 var inv = await _inventoryRepo.GetByCTNNo(inventoryViewModel.CTNNo, inventoryViewModel.ShippingRef);
-                if ((inv == null ? 0 : inv.Id) == inventoryViewModel.Id)
+                if(inv == null)
                 {
                     var inventoryToCreate = new ImportInventory
                     {
@@ -579,8 +762,35 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                     return "Inventory updated successfully";
                 }
                 else
-                { 
-                    return "Inventory with same CTN No already exists";
+                {
+                    if(inv.Id == inventoryViewModel.Id)
+                    {
+                        var inventoryToCreate = new ImportInventory
+                        {
+                            Id = inventoryViewModel.Id,
+                            CtnNo = inventoryViewModel.CTNNo,
+                            //ShippingMark = inventoryViewModel.ShippingMark,
+                            Description = inventoryViewModel?.Description,
+                            ProductId = inventoryViewModel.ProductId,
+                            Qty = inventoryViewModel.QuantityAdded,
+                            Weight = inventoryViewModel.Weight,
+                            SupplierId = inventoryViewModel.SupplierId,
+                            Updated_on = DateTime.UtcNow,
+                            Export_status = false,
+                            Shipping_ref = inventoryViewModel.ShippingRef
+                        };
+
+                        _logger.LogInformation("Sending request to update an inventory.");
+
+                        await _inventoryRepo.Update(inventoryToCreate);
+
+
+                        return "Inventory updated successfully";
+                    }
+                    else
+                    {
+                        return "Inventory with same CTN No already exists";
+                    }
                 }
             }
             catch (Exception ex)
@@ -636,6 +846,12 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                         var supplier = await _supplierRepo.Get(inventory.SupplierId);
                         var user = await _userRepo.Get(inventory.CreatedBy);
                         var Shipuser = await _userRepo.Get(inventory.Shipped_by);
+                        var ship = await _shipmentnameRepo.Get(Convert.ToInt32(inventory.Shipping_ref == null ? 0 : inventory.Shipping_ref));
+                        var count = 0;
+                        if (ship != null)
+                        {
+                            count = await _shipmentnameRepo.GetCountWithShipmentName(ship.Id);
+                        }
                         tempList.Add(new ShipmentViewModel
                         {
                             Id = inventory.Id,
@@ -648,7 +864,8 @@ namespace IMS_Dashboard.Services.InventoryServices.Service
                             Supplier = supplier?.ShipmentMarks,
                             CreatedOn = inventory.CreatedOn,
                             Created_by = user?.NameOfUser,
-                            ShippingRef = inventory.Shipping_ref,
+                            //ShippingRef = inventory.Shipping_ref,
+                            ShippingRef = ship == null ? "" : count.ToString() + " CTN " + ship.ShipmentName,
                             ShippedOn = inventory.Shipped_on,
                             Shipped_by = Shipuser?.NameOfUser,
                             Export_Status = inventory.Export_status ? "Pending" : "Completed",

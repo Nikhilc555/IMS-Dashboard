@@ -50,6 +50,7 @@ builder.Services.AddScoped<IsupplierRepository, supplierRepository>();
 builder.Services.AddScoped<IuserRepository, userRepository>();
 builder.Services.AddScoped<IroleRepository, roleRepository>();
 builder.Services.AddScoped<IreportRepository, reportRepository>();
+builder.Services.AddScoped<IshipmentnameRepository, ShipmentnameRepository>();
 builder.Services.AddScoped<IuserService, userService>();
 builder.Services.AddScoped<IsupplierService, supplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
