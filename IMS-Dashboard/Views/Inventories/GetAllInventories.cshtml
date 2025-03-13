@@ -49,13 +49,13 @@
                         <tr>
                             <th> # </th>
                             <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.ShippingMark) </th>
                             @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
-                            <th> @Html.DisplayNameFor(model => model.Supplier) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.Supplier) </th> *@
                             <th> @Html.DisplayNameFor(model => model.Description) </th>
                             <th> @Html.DisplayNameFor(model => model.Quantity) </th>
                             <th> @Html.DisplayNameFor(model => model.Weight) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.ShippingRef) </th> *@
                             <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
                             <th> @Html.DisplayNameFor(model => model.Created_by) </th>
                         </tr>
@@ -69,17 +69,23 @@
                                 <tr>
                                     <td> @rowNumber </td>
                                     <td> @inventory.CTNNo </td>
-                                    @* <td> @inventory.ShippingMark </td> *@
+                                    <td> @inventory.ShippingMark </td>
                                     @* <td> @inventory.Product </td> *@
-                                    <td> @inventory.Supplier </td>
+                                    @* <td> @inventory.Supplier </td> *@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
-                                    <td> @inventory.ShippingRef </td>
+                                    @* <td> @inventory.ShippingRef </td> *@
                                     <td> @inventory.CreatedOn </td>
                                     <td> @inventory.Created_by </td>
                                 </tr>
                                 rowNumber++;
+                            }
+                            if (rowNumber == 1)
+                            {
+                                <tr>
+                                    <td colspan="10">No data found</td>
+                                </tr>
                             }
                         }
                     </tbody>

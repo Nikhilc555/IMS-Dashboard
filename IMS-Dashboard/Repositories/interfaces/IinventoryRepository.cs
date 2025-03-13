@@ -15,7 +15,7 @@ namespace IMS_Dashboard.Repositories.interfaces
         Task<IEnumerable<ImportInventory>> GetAllPendingWithDate(string from_date, string to_date);
         Task<IEnumerable<ImportInventory>> GetAllPendingWithShipRef(string Shippingref);
         Task<IEnumerable<ImportInventory>> GetAllWithDate(string from_date, string to_date);
-        Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date);
+        Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date, int shippingRef);
         Task<bool> UpdateForShipment(List<int> remainingIds, string shippingRef);
         Task<int> GetShippedInventoryCount();
         Task<int> GetPendingInventoryCount();

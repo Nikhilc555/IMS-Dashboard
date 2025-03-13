@@ -3,19 +3,14 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Create Inventory</h4>
+            <h4 class="card-title">Create Stock</h4>
 
             <form asp-action="AddInventory" class="forms-sample" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="row">
                     <div class="col-md-6">
-                        @* <div class="col-md-6">
-                        <label asp-for="ShippingMark" class="control-label"></label>
-                        <input asp-for="ShippingMark" type="text" class="form-control"
-                               placeholder="Enter Shipping Mark.." id="ShippingMark">
-                        <span asp-validation-for="ShippingMark" class="text-danger"></span>
-                    </div> *@
+                        
                         <div class="form-group row">
                             <label asp-for="CTNNo" class="control-label"></label>
                             <div class="col-sm-9">
@@ -26,11 +21,19 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group row">
+                        @* <div class="form-group row">
                             <label asp-for="SupplierId" class="control-label"> Shipment Mark</label>
                             <div class="col-sm-9">
                                 <select class="form-select" asp-for="SupplierId" asp-items="@Model.Suppliers"></select>
                                 <span asp-validation-for="SupplierId" class="text-danger"></span>
+                            </div>
+                        </div> *@
+                        <div class="form-group row">
+                            <label asp-for="ShippingMark" class="control-label">Shipment Mark</label>
+                            <div class="col-sm-9">
+                                <input asp-for="ShippingMark" type="text" class="form-control"
+                                       placeholder="Enter Shipping Mark.." id="ShippingMark">
+                                <span asp-validation-for="ShippingMark" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -54,7 +57,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label asp-for="QuantityAdded" class="control-label"></label>
+                            <label asp-for="QuantityAdded" class="control-label">Quantity</label>
                             <div class="col-sm-9">
                                 <input asp-for="QuantityAdded" type="number" class="form-control"
                                        placeholder="Enter Quantity want to be added.." id="QuantityAdded">
@@ -78,16 +81,18 @@
 
                     <div class="col-md-6">
                         <div class="form-group row">
-                            <label asp-for="ShippingRef" class="control-label"> Shipment Mark</label>
+                            <label asp-for="ShippingRef" class="control-label"> Shipment For</label>
                             <div class="col-sm-9">
-                                <select class="form-select" asp-for="ShippingRef" asp-items="@Model.ShippingRefOptions"></select>
+                                <select class="form-select" asp-for="ShippingRef" style="color:black;" asp-items="@Model.ShippingRefOptions">
+                                    <option value="0" selected="selected">Pending Stock</option>
+                                </select>
                                 <span asp-validation-for="ShippingRef" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-black">Add Inventory</button>
+                <button type="submit" class="btn btn-black">Add Stock</button>
             </form>
         </div>
     </div>

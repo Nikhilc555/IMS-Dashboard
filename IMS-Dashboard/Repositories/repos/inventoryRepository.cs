@@ -43,7 +43,7 @@ namespace IMS_Dashboard.Repositories.repos
                 {
                     // Update properties
                     existingInv.CtnNo = inv.CtnNo;
-                    //existingInv.ShippingMark = inv.ShippingMark;
+                    existingInv.ShippingMark = inv.ShippingMark;
                     existingInv.SupplierId = inv.SupplierId;
                     existingInv.Description = inv.Description;
                     existingInv.ProductId = inv.ProductId;
@@ -107,7 +107,7 @@ namespace IMS_Dashboard.Repositories.repos
 
         public async Task<IEnumerable<ImportInventory>> GetAllPending()
         {
-            var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y").ToList();
+            var inventory = _context.ImportInventories.Where(c => c.Export_status == false && c.IsActive == "Y" && c.Shipping_ref == "0").ToList();
             return inventory;
         }
 
@@ -131,7 +131,7 @@ namespace IMS_Dashboard.Repositories.repos
                 {
                     toDate = DateTime.Today;
                 }
-                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N" && i.Export_status == false);
+                inventory = inventory.Where(i => i.CreatedOn >= fromDate && i.CreatedOn < toDate.AddDays(1) && i.IsActive != "N" && i.Export_status == false && i.Shipping_ref == "0");
             }
             else 
             {
@@ -224,6 +224,17 @@ namespace IMS_Dashboard.Repositories.repos
 
                     _context.SaveChanges();
 
+
+                    var shipment = await _context.ShipmentList.FindAsync(Convert.ToInt32(shippingRef));
+
+                    if (shipment != null)
+                    {
+                        shipment.IsActive = false;
+
+                        _context.ShipmentList.Update(shipment);
+                        await _context.SaveChangesAsync();
+                    }
+
                     return true;
                 }
                 else
@@ -237,7 +248,7 @@ namespace IMS_Dashboard.Repositories.repos
             }
         }
 
-        public async Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date)
+        public async Task<IEnumerable<ImportInventory>> GetShipmentWithDate(string from_date, string to_date, int shippingRef = 0)
         {
             var inventory = _context.ImportInventories.ToList().AsEnumerable().Where(i => i.Export_status);
 
@@ -275,6 +286,8 @@ namespace IMS_Dashboard.Repositories.repos
 
                 inventory = inventory.Where(i => i.Shipped_on >= fromDate && i.Shipped_on < toDate.AddDays(1) && i.IsActive != "N");
             }
+
+            inventory = inventory.Where(i => i.Shipping_ref == shippingRef.ToString() || shippingRef == 0);
 
             return inventory;
         }

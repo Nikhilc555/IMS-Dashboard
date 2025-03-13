@@ -10,8 +10,8 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Display(Name = "CTN No")]
         public int? CTNNo { get; set; }
 
-        //[Display(Name = "Shipping Mark")]
-        //public string ShippingMark { get; set; }
+        [Display(Name = "Shipment Mark")]
+        public string ShippingMark { get; set; }
         public string? Description { get; set; }
         public int? ProductId { get; set; }
         public int? SupplierId { get; set; }
@@ -25,8 +25,14 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Display(Name = "Quantity")]
         public int? Quantity { get; set; }
         public decimal? Weight { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public string Created_by { get; set; }
+
+        [Display(Name = "Shipped On")]
+        public DateTime? ShippedOn { get; set; }
+
+        [Display(Name = "Shipped By")]
+        public string Shipped_by { get; set; }
 
         [Display(Name = "Status")]
         public string Export_Status { get; set; }

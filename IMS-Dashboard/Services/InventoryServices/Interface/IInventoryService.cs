@@ -13,8 +13,9 @@ namespace IMS_Dashboard.Services.InventoryServices.Interface
         Task<IEnumerable<GetAllInventoryViewModel>> GetPendingInventoryWithDate(string from_date, string to_date);
         Task<IEnumerable<GetAllInventoryViewModel>> GetPendingWithShipRef(string ShippingRef);
         Task<IEnumerable<ShipmentNameViewModel>> GetAllShipmentNames();
+        Task<IEnumerable<ShipmentNameViewModel>> GetAllShipmentList();
         Task<IEnumerable<GetAllInventoryViewModel>> GetAllInventorywithdate(string from_date, string to_date);
-        Task<IEnumerable<ShipmentViewModel>> GetShipmentwithdate(string from_date, string to_date);
+        Task<IEnumerable<GetAllInventoryViewModel>> GetShipmentwithdate(string from_date, string to_date, int shippingRef);
         Task<string> AddShipment(AddShipmentNameViewModel shipmentViewModel);
         Task<IEnumerable<DisplayRecentInventoryViewModel>> GetRecentInventories();
         Task<bool> CreateInventory(CreateInventoryViewModel inventoryViewModel);

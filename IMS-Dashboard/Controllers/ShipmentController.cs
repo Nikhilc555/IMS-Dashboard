@@ -17,7 +17,7 @@ namespace IMS_Dashboard.Controllers
         private readonly IInventoryService _inventoryService;
         private readonly IProductService _productService;
         private readonly ISupplierService _supplierService;
-        private readonly ILogger<ShipmentController> _logger;
+        private readonly ILogger<ShipmentController> _logger; 
 
         public ShipmentController(IInventoryService inventoryService, IProductService productService, ISupplierService supplierService,
             ILogger<ShipmentController> logger)
@@ -37,16 +37,26 @@ namespace IMS_Dashboard.Controllers
             {
                 _logger.LogInformation("Fetching all Inventories");
 
+                GetAllShipmentViewModel shipviewmodel = new GetAllShipmentViewModel();
+
                 if (from_date == null || to_date == null)
                 {
 
                     var inventory = await _inventoryService.GetPendingInventory();
-                    return View(inventory);
+
+                    shipviewmodel.Inventory = inventory;
+                    shipviewmodel.from_date = from_date;
+                    shipviewmodel.to_date = to_date;
+                    return View(shipviewmodel);
                 }
                 else
                 {
                     var inventory = await _inventoryService.GetPendingInventoryWithDate(from_date, to_date);
-                    return View(inventory);
+
+                    shipviewmodel.Inventory = inventory;
+                    shipviewmodel.from_date = from_date;
+                    shipviewmodel.to_date = to_date;
+                    return View(shipviewmodel);
                 }
             }
             catch (HttpRequestException ex)
@@ -85,14 +95,24 @@ namespace IMS_Dashboard.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetShippedDetails(string? from_date, string? to_date)
+        public async Task<IActionResult> GetShippedDetails(string? from_date, string? to_date, int shippingRef)
         {
             try
             {
                 _logger.LogInformation("Fetching all Inventories");
 
-                var inventory = await _inventoryService.GetShipmentwithdate(from_date, to_date);
-                return View(inventory);
+                GetAllShipmentViewModel shipviewmodel = new GetAllShipmentViewModel();
+
+
+                var inventory = await _inventoryService.GetShipmentwithdate(from_date, to_date, shippingRef);
+
+                shipviewmodel.Inventory = inventory;
+                shipviewmodel.ShippingRef = shippingRef.ToString();
+                shipviewmodel.from_date = from_date;
+                shipviewmodel.to_date = to_date;
+                PopulateDropDowns(shipviewmodel);
+
+                return View(shipviewmodel);
             }
             catch (HttpRequestException ex)
             {
@@ -212,6 +232,8 @@ namespace IMS_Dashboard.Controllers
                 }
             }
 
+            TempData["SuccessMessage"] = "Shipment completed successfully!";
+            //_toastNotification.AddSuccessToastMessage("Shipment completed successfully!");
             return RedirectToAction(nameof(GetInventoryForShipping));
         }
         private async Task PopulateDropDownsNew(GetAllShipmentViewModel shipmentViewModel)
@@ -224,6 +246,22 @@ namespace IMS_Dashboard.Controllers
             //    Text = p.ToString()
             //}).ToList();
             var shipmentlist = await _inventoryService.GetAllShipmentNames();
+            shipmentViewModel.ShippingRefOptions = shipmentlist.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.ShipmentName
+            }).ToList();
+        }
+        private async Task PopulateDropDowns(GetAllShipmentViewModel shipmentViewModel)
+        {
+
+            //var shippingRef = GetWeeksForNext6Months();
+            //shipmentViewModel.ShippingRefOptions = shippingRef.Select(p => new SelectListItem
+            //{
+            //    Value = p.ToString(),
+            //    Text = p.ToString()
+            //}).ToList();
+            var shipmentlist = await _inventoryService.GetAllShipmentList();
             shipmentViewModel.ShippingRefOptions = shipmentlist.Select(p => new SelectListItem
             {
                 Value = p.Id.ToString(),

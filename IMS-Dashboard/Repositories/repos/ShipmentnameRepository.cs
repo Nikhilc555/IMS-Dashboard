@@ -50,6 +50,11 @@ namespace IMS_Dashboard.Repositories.repos
             var shipmentlist = _context.ShipmentList.ToList().Where(u => u.IsActive);
             return shipmentlist;
         }
+        public async Task<IEnumerable<ShipmentList>> GetAllList()
+        {
+            var shipmentlist = _context.ShipmentList.ToList();
+            return shipmentlist;
+        }
 
         public async Task<int> GetCountWithShipmentName(int id)
         {

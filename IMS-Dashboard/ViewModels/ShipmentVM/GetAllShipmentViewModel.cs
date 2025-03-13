@@ -8,5 +8,7 @@ namespace IMS_Dashboard.ViewModels.ShipmentVM
         public string ShippingRef { get; set; }
         public IEnumerable<GetAllInventoryViewModel> Inventory { get; set; }
         public List<SelectListItem>? ShippingRefOptions { get; set; }
+        public string from_date { get; set; }
+        public string to_date { get; set; }
     }
 }

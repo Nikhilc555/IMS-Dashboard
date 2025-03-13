@@ -12,8 +12,8 @@ public partial class ImportInventory
     [Column("ctn_no")]
     public int? CtnNo { get; set; }
 
-    //[Column("shipping_mark")]
-    //public string? ShippingMark { get; set; }
+    [Column("shipping_mark")]
+    public string? ShippingMark { get; set; }
 
     [Column("supplier_id")]
     public int? SupplierId { get; set; }

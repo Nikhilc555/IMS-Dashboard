@@ -1,9 +1,9 @@
-﻿@model IEnumerable<IMS_Dashboard.ViewModels.ShipmentVM.ShipmentViewModel>
+﻿@model IMS_Dashboard.ViewModels.ShipmentVM.GetAllShipmentViewModel
 
 @{
-    ViewData["Title"] = "Shipped Details";
-    var from_date = Model?.FirstOrDefault()?.from_date ?? DateTime.Today.ToString("yyyy-MM-dd");
-    var to_date = Model?.FirstOrDefault()?.to_date ?? DateTime.Today.ToString("yyyy-MM-dd");
+    ViewData["Title"] = "Completed Shipment";
+    var from_date = Model?.from_date ?? "";
+    var to_date = Model?.to_date ?? "";
 }
 
 <div class="col-lg-12 grid-margin stretch-card">
@@ -16,25 +16,32 @@
             <form class="search-form" asp-controller="Shipment" asp-action="GetShippedDetails" method="get">
                 <div class="col-md-12 row">
                     <div class="col-md-4">
+                        @* <label for="ShippingRef" class="control-label"></label> *@
+                        <select asp-for="ShippingRef" asp-items="Model.ShippingRefOptions" class="form-control" style="color:black;" onchange="this.form.submit();">
+                            <option value="">Select Shipping Reference</option>
+                        </select>
+                        <span validation-for="ShippingRef" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-2">
                         <div id="from_date" class="input-group date datepicker navbar-date-picker">
                             <span class="input-group-addon input-group-prepend border-right">
                                 <span class="icon-calendar input-group-text calendar-icon"></span>
                             </span>
-                            <input type="text" name="from_date" class="form-control" value="@from_date">
+                            <input type="text" name="from_date" class="form-control" placeholder="yyyy-MM-dd" value="@from_date">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <div id="to_date" class="input-group date datepicker navbar-date-picker">
                             <span class="input-group-addon input-group-prepend border-right">
                                 <span class="icon-calendar input-group-text calendar-icon"></span>
                             </span>
-                            <input type="text" name="to_date" class="form-control" value="@to_date">
+                            <input type="text" name="to_date" class="form-control" placeholder="yyyy-MM-dd" value="@to_date">
                         </div>
                     </div>
                     <div class="col-md-4">
 
                         <button type="submit" class="btn btn-black"><i class="icon-search"></i></button>
-                        <button type="button" id="downloadExcel" class="btn btn-black">Download Excel</button>
+                        <button type="button" id="downloadExcel" style="float:right;" class="btn btn-black">Download Excel</button>
                     </div>
                     @* <div class="col-md-2">
                         <button type="button" class="btn btn-success" style="float:right;" onclick="window.location.href='@Url.Action("AddInventory", "Inventories")'">
@@ -48,33 +55,33 @@
                     <thead>
                         <tr>
                             <th> # </th>
-                            <th class="shipped"> @Html.DisplayNameFor(model => model.ShippingRef) </th>
-                            <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                            @* <th class="shipped"> @Html.DisplayNameFor(model => model.ShippingRef) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().CTNNo) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingMark) </th>
                             @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
-                            <th> @Html.DisplayNameFor(model => model.Supplier) </th>
-                            <th> @Html.DisplayNameFor(model => model.Description) </th>
-                            <th> @Html.DisplayNameFor(model => model.Quantity) </th>
-                            <th> @Html.DisplayNameFor(model => model.Weight) </th>
-                            <th class="shipped"> @Html.DisplayNameFor(model => model.CreatedOn) </th>
-                            <th class="shipped"> @Html.DisplayNameFor(model => model.Created_by) </th>
-                            <th class="shipped"> @Html.DisplayNameFor(model => model.ShippedOn) </th>
-                            <th class="shipped"> @Html.DisplayNameFor(model => model.Shipped_by) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.Supplier) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Description) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Quantity) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Weight) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Inventory.First().CreatedOn) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Inventory.First().Created_by) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Inventory.First().ShippedOn) </th>
+                            <th class="shipped"> @Html.DisplayNameFor(model => model.Inventory.First().Shipped_by) </th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (Model != null)
                         {
                             int rowNumber = 1;
-                            @foreach (var inventory in Model)
+                            @foreach (var inventory in Model.Inventory)
                             {
                                 <tr>
                                     <td> @rowNumber </td>
-                                    <td class="shipped"> @inventory.ShippingRef </td>
+                                    @* <td class="shipped"> @inventory.ShippingRef </td> *@
                                     <td> @inventory.CTNNo </td>
-                                    @* <td> @inventory.ShippingMark </td> *@
+                                    <td> @inventory.ShippingMark </td>
                                     @* <td> @inventory.Product </td> *@
-                                    <td> @inventory.Supplier </td>
+                                    @* <td> @inventory.Supplier </td> *@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
@@ -84,6 +91,12 @@
                                     <td class="shipped"> @inventory.Shipped_by </td>
                                 </tr>
                                 rowNumber++;
+                            }
+                            if(rowNumber == 1)
+                            {
+                                <tr>
+                                    <td colspan="10">No data found</td>
+                                </tr>
                             }
                         }
                     </tbody>

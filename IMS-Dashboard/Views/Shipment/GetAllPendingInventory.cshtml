@@ -1,9 +1,9 @@
-﻿@model IEnumerable<IMS_Dashboard.ViewModels.InventoryVM.GetAllInventoryViewModel>
+﻿@model IMS_Dashboard.ViewModels.ShipmentVM.GetAllShipmentViewModel
 
 @{
-    ViewData["Title"] = "Current Stock";
-    var from_date = Model?.FirstOrDefault()?.from_date ?? "";
-    var to_date = Model?.FirstOrDefault()?.to_date ?? "";
+    ViewData["Title"] = "Pending Stocks";
+    var from_date = Model?.from_date ?? "";
+    var to_date = Model?.to_date ?? "";
 }
 
 <div class="col-lg-12 grid-margin stretch-card">
@@ -20,7 +20,7 @@
                             <span class="input-group-addon input-group-prepend border-right">
                                 <span class="icon-calendar input-group-text calendar-icon"></span>
                             </span>
-                            <input type="text" name="from_date" class="form-control" value="@from_date">
+                            <input type="text" name="from_date" class="form-control" placeholder="yyyy-MM-dd" value="@from_date">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -28,7 +28,7 @@
                             <span class="input-group-addon input-group-prepend border-right">
                                 <span class="icon-calendar input-group-text calendar-icon"></span>
                             </span>
-                            <input type="text" name="to_date" class="form-control" value="@to_date">
+                            <input type="text" name="to_date" class="form-control" placeholder="yyyy-MM-dd" value="@to_date">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -54,16 +54,16 @@
                     <thead>
                         <tr>
                             <th> # </th>
-                            <th> @Html.DisplayNameFor(model => model.CTNNo) </th>
-                            @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().CTNNo) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingMark) </th>
                             @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
-                            <th> @Html.DisplayNameFor(model => model.Supplier) </th>
-                            <th> @Html.DisplayNameFor(model => model.Description) </th>
-                            <th> @Html.DisplayNameFor(model => model.Quantity) </th>
-                            <th> @Html.DisplayNameFor(model => model.Weight) </th>
-                            <th> @Html.DisplayNameFor(model => model.ShippingRef) </th>
-                            <th> @Html.DisplayNameFor(model => model.CreatedOn) </th>
-                            <th> @Html.DisplayNameFor(model => model.Created_by) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.Supplier) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Description) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Quantity) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Weight) </th>
+                            @* <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingRef) </th> *@
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().CreatedOn) </th>
+                            <th> @Html.DisplayNameFor(model => model.Inventory.First().Created_by) </th>
                             <th class="tdcontrol"></th>
                             <th class="tdcontrol"></th>
                         </tr>
@@ -72,18 +72,18 @@
                         @if (Model != null)
                         {
                             int rowNumber = 1;
-                            @foreach (var inventory in Model)
+                            @foreach (var inventory in Model.Inventory)
                             {
                                 <tr>
                                     <td> @rowNumber </td>
                                     <td> @inventory.CTNNo </td>
-                                    @* <td> @inventory.ShippingMark </td> *@
+                                    <td> @inventory.ShippingMark </td>
                                     @* <td> @inventory.Product </td> *@
-                                    <td> @inventory.Supplier </td>
+                                    @* <td> @inventory.Supplier </td> *@
                                     <td> @inventory.Description </td>
                                     <td> @inventory.Quantity </td>
                                     <td> @inventory.Weight </td>
-                                    <td> @inventory.ShippingRef </td>
+                                    @* <td> @inventory.ShippingRef </td> *@
                                     <td> @inventory.CreatedOn </td>
                                     <td> @inventory.Created_by </td>
                                     <td class="tdcontrol">
@@ -93,13 +93,19 @@
                                         </form>
                                     </td>
                                     <td class="tdcontrol">
-                                        <form action="/inventories/DeleteInventory" method="post">
+                                        <form action="/inventories/DeleteInventory" method="post" onsubmit="return confirmDelete(event);">
                                             <input type="hidden" name="id" value="@inventory.Id" />
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
                                 rowNumber++;
+                            }
+                            if (rowNumber == 1)
+                            {
+                                <tr>
+                                    <td colspan="10">No data found</td>
+                                </tr>
                             }
                         }
                     </tbody>

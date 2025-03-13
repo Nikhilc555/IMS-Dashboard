@@ -9,5 +9,6 @@ namespace IMS_Dashboard.Repositories.interfaces
         Task<IEnumerable<ShipmentList>> GetAll();
         Task Create(ShipmentList shipname);
         Task<int> GetCountWithShipmentName(int id);
+        Task<IEnumerable<ShipmentList>> GetAllList();
     }
 }

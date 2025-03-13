@@ -9,9 +9,10 @@ namespace IMS_Dashboard.ViewModels.InventoryVM
         [Required(ErrorMessage = "CTN No is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "CTNNo must be greater than 0.")]
         public int CTNNo { get; set; }
-        //public string? ShippingMark { get; set; }
-        [Required(ErrorMessage = "Supplier is required.")]
-        public int SupplierId { get; set; }
+        [Required(ErrorMessage = "Shipping Mark is required.")]
+        public string? ShippingMark { get; set; }
+        //[Required(ErrorMessage = "Shipping Mark is required.")]
+        public int? SupplierId { get; set; }
         [Required(ErrorMessage = "Description is required.")]
         public string Description { get; set; }
         public int? ProductId { get; set; }

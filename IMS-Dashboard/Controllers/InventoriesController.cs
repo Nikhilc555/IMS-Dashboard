@@ -85,7 +85,7 @@ namespace IMS_Dashboard.Controllers
 
             addInventoryViewModel.Id = inventory.Id;
             addInventoryViewModel.CTNNo = inventory.CTNNo ?? 0;
-            //addInventoryViewModel.ShippingMark = inventory.ShippingMark;
+            addInventoryViewModel.ShippingMark = inventory.ShippingMark;
             addInventoryViewModel.ProductId = inventory.ProductId;
             addInventoryViewModel.Description = inventory.Description;
             addInventoryViewModel.SupplierId = inventory.SupplierId ?? 0;

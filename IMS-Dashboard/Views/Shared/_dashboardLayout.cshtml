@@ -42,21 +42,6 @@
         </div>
     </div>
 
-    @if (TempData["Message"] != null)
-    {
-        if (TempData["MessageType"].ToString() == "success")
-        {
-            <div class="alert alert-success">@TempData["Message"]
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-danger">
-                @TempData["Message"]
-            </div>
-        }
-    }
-
     <script src="~/assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="~/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

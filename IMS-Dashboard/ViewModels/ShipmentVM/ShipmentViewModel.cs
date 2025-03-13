@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace IMS_Dashboard.ViewModels.ShipmentVM
 {
@@ -9,8 +10,8 @@ namespace IMS_Dashboard.ViewModels.ShipmentVM
         [Display(Name = "CTN No")]
         public int? CTNNo { get; set; }
 
-        //[Display(Name = "Shipping Mark")]
-        //public string ShippingMark { get; set; }
+        [Display(Name = "Shipping Mark")]
+        public string ShippingMark { get; set; }
         public string? Description { get; set; }
         public int? ProductId { get; set; }
         public int? SupplierId { get; set; }
@@ -38,5 +39,6 @@ namespace IMS_Dashboard.ViewModels.ShipmentVM
         public string Export_Status { get; set; }
         public string from_date { get; set; }
         public string to_date { get; set; }
+        public List<SelectListItem>? ShippingRefOptions { get; set; }
     }
 }

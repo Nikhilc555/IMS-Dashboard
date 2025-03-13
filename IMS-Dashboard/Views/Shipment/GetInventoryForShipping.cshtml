@@ -1,7 +1,7 @@
 ﻿@model IMS_Dashboard.ViewModels.ShipmentVM.GetAllShipmentViewModel
 
 @{
-    ViewData["Title"] = "Shipment";
+    ViewData["Title"] = "Shipping Stocks";
 }
 
 <div class="col-lg-12 grid-margin stretch-card">
@@ -9,36 +9,42 @@
         <div class="card-body">
             <h4 class="card-title">@ViewData["Title"]</h4>
 
-            <div class="table-responsive pt-3">
-                <form asp-controller="shipment" asp-action="GetInventoryForShipping" method="get" class="forms-sample" enctype="multipart/form-data">
-                    <div class="row m-lg-2">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label for="ShippingRef" class="control-label"></label>
-                                <select asp-for="ShippingRef" asp-items="Model.ShippingRefOptions" class="form-control" onchange="this.form.submit();">
-                                    <option value="">Select Shipping Reference</option>
-                                </select>
-                                <span validation-for="ShippingRef" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <hr />
 
-                @if (Model.Inventory != null && Model.Inventory.Any())
-                {
+            <form asp-controller="shipment" asp-action="GetInventoryForShipping" method="get" class="forms-sample" enctype="multipart/form-data">
+                <div class="col-md-12 row">
+                    <div class="col-md-6">
+                        @* <label for="ShippingRef" class="control-label"></label> *@
+                        <select asp-for="ShippingRef" asp-items="Model.ShippingRefOptions" class="form-select" style="color:black;" onchange="this.form.submit();">
+                            <option value="">Select Shipping Reference</option>
+                        </select>
+                        <span validation-for="ShippingRef" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" style="float:right;" class="btn btn-black" onclick="window.location.href='@Url.Action("AddInventory", "Inventories")'">Add Stock</button>
+                        <button type="button" id="downloadExcel" style="float:right; margin-right:5px;" class="btn btn-black pr-2">Download Excel</button>
+                        @* <button type="button" class="btn btn-red" style="float:right;" onclick="window.location.href='@Url.Action("GetInventoryForShipping", "Shipment")'">
+                            Ship Inventory
+                        </button> *@
+                    </div>
+                </div>
+            </form>
+                <hr />
+                
+                @* @if (Model.Inventory != null && Model.Inventory.Any())
+                { *@
+            <div class="table-responsive pt-3 mb-3">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th> # </th>
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().CTNNo) </th>
-                                    @* <th> @Html.DisplayNameFor(model => model.ShippingMark) </th> *@
+                                    <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingMark) </th>
                                     @* <th> @Html.DisplayNameFor(model => model.Product) </th> *@
-                                    <th> @Html.DisplayNameFor(model => model.Inventory.First().Supplier) </th>
+                                    @* <th> @Html.DisplayNameFor(model => model.Inventory.First().Supplier) </th> *@
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().Description) </th>
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().Quantity) </th>
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().Weight) </th>
-                                    <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingRef) </th>
+                                    @* <th> @Html.DisplayNameFor(model => model.Inventory.First().ShippingRef) </th> *@
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().CreatedOn) </th>
                                     <th> @Html.DisplayNameFor(model => model.Inventory.First().Created_by) </th>
                                     @* <th></th> *@
@@ -50,49 +56,76 @@
                                 @if (Model != null)
                                 {
                                     int rowNumber = 1;
-                                    @foreach (var inventory in Model.Inventory)
-                                    {
-                                        <tr data-id="@inventory.Id">
-                                            <td> @rowNumber </td>
-                                            <td> @inventory.CTNNo </td>
-                                            @* <td> @inventory.ShippingMark </td> *@
-                                            @* <td> @inventory.Product </td> *@
-                                            <td> @inventory.Supplier </td>
-                                            <td> @inventory.Description </td>
-                                            <td> @inventory.Quantity </td>
-                                            <td> @inventory.Weight </td>
-                                            <td> @inventory.ShippingRef </td>
-                                            <td> @inventory.CreatedOn </td>
-                                            <td> @inventory.Created_by </td>
-                                            @* <td>
-                                                <button type="button" class="btn btn-danger btn-sm delete-shipment">Delete</button>
-                                            </td> *@
-                                            <td class="tdcontrol">
-                                                <form action="/inventories/EditInventory" method="get">
-                                                    <input type="hidden" name="id" value="@inventory.Id" />
-                                                    <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                                                </form>
-                                            </td>
-                                            <td class="tdcontrol">
-                                                <form action="/inventories/DeleteInventory" method="post">
-                                                    <input type="hidden" name="id" value="@inventory.Id" />
-                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        rowNumber++;
+                                    @if (Model.Inventory != null && Model.Inventory.Any())
+                                        @foreach (var inventory in Model.Inventory)
+                                        {
+                                            <tr data-id="@inventory.Id">
+                                                <td> @rowNumber </td>
+                                                <td> @inventory.CTNNo </td>
+                                                <td> @inventory.ShippingMark </td>
+                                                @* <td> @inventory.Product </td> *@
+                                                @* <td> @inventory.Supplier </td> *@
+                                                <td> @inventory.Description </td>
+                                                <td> @inventory.Quantity </td>
+                                                <td> @inventory.Weight </td>
+                                                @* <td> @inventory.ShippingRef </td> *@
+                                                <td> @inventory.CreatedOn </td>
+                                                <td> @inventory.Created_by </td>
+                                                @* <td>
+                                                    <button type="button" class="btn btn-danger btn-sm delete-shipment">Delete</button>
+                                                </td> *@
+                                                <td class="tdcontrol">
+                                                    <form action="/inventories/EditInventory" method="get">
+                                                        <input type="hidden" name="id" value="@inventory.Id" />
+                                                        <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                                    </form>
+                                                </td>
+                                                <td class="tdcontrol">
+                                                <form action="/inventories/DeleteInventory" method="post" onsubmit="return confirmDelete(event);">
+                                                        <input type="hidden" name="id" value="@inventory.Id" />
+                                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            rowNumber++;
+                                        }
                                     }
-                                }
+                                    @if (Model.Inventory == null || !Model.Inventory.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="10">No data found</td>
+                                        </tr>
+                                    }
                             </tbody>
                         </table>
 
-                    <form method="post" asp-action="UpdateExportStatus">
-                        <input type="hidden" id="updatedInventoryForShipment" name="updatedInventoryForShipment" />
+                </div>
+            @if (Model.Inventory != null && Model.Inventory.Any())
+            {
+                <form method="post" asp-action="UpdateExportStatus">
+                    <input type="hidden" id="updatedInventoryForShipment" name="updatedInventoryForShipment" />
+                    <input type="hidden" id="shippingRef" asp-for="ShippingRef" name="shippingRef" />
 
-                        <button type="submit" class="btn btn-black" id="submitForShipment">Export</button>
-                    </form>
-                }
-            </div>
+                    <button type="submit" class="btn btn-red" id="submitForShipment">Complete Shipment</button>
+                </form>
+            }
+            @{
+                var successMessage = TempData["SuccessMessage"] as string;
+                var errorMessage = TempData["ErrorMessage"] as string;
+                
+            }
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-success" style="margin-top:5px;">
+                    @successMessage
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger" style="margin-top:5px;">
+                    @errorMessage
+                </div>
+            }
         </div>
     </div>
 </div>
